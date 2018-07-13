@@ -1,8 +1,0 @@
-/* pages/htmldetail/htmldetail.wxss */
-@import "/wxParse/wxParse.wxss";
-.sus-h2{
-    color: red;
-}
-.sp_detail{ float: left; width: 98%; margin-left: 1%; clear: both; overflow: hidden; font-size: 14px; line-height: 20px; color: #666;}
-.sp_detail p{ max-width: 100%;}
-.sp_detail img{ max-width: 100%;}

@@ -1,0 +1,115 @@
+<!--pages/manage/change/change.wxml-->
+<view wx:if="{{typeId=='3'}}">
+  <view style='display: flex;justify-content: center;align-items: center;width:100%'>
+  {{title}}
+  </view>
+  <view class='flex-column' style='padding-top:50rpx;'>
+    <view class='flex-row'>
+      <view><text>听课标题：</text></view>
+      <view><input placeholder="听课的标题"></input></view>
+    </view>
+    <view class='flex-row'>
+      <view><text>背景图片：</text></view>
+      <view class="uploader">
+        <view class="uploader-text" bindtap="doUpload">
+            <text>上传图片</text>
+        </view>
+        <view class="uploader-container" wx:if="{{imgUrl}}">
+            <image
+                class="uploader-image"
+                src="{{imgUrl}}"
+                mode="aspectFit"
+                bindtap="previewImg"
+            ></image>
+        </view>
+      </view>
+    </view>
+    <view class='flex-row'>
+      <view><text>声音文件：</text></view>
+      <view><button>upload</button></view>
+    </view>
+    <view class='flex-row'>
+      <view><text>免费时间：</text></view>
+      <view><input placeholder="单位分"></input></view>
+    </view>
+    <view style='padding-top:100rpx;'>
+    <button type='primary'>上传</button>
+    </view>
+  </view>
+</view>
+<view style='padding-left:30rpx;' wx:else>
+  <view style='display: flex;justify-content: center;align-items: center;width:100%'>
+  {{title}}
+  </view>
+  <view class='flex-column' style='padding-top:50rpx;'>
+    <view class='flex-row'>
+      
+      <view>
+        <!-- <picker  mode="multiSelector"  bindchange="bindPickerChange" value="{{multiIndex}}" range="{{KMarray}}"> -->
+        <picker mode="multiSelector" bindchange="bindMultiPickerChange" bindcolumnchange="bindMultiPickerColumnChange" value="{{multiIndex}}" range="{{multiArray}}">
+        <view class='flex-row'>
+          <view><text>科目标题：</text></view>
+          <view class="picker">
+            {{multiArray[0][multiIndex[0]]}}
+          </view>
+        </view>
+        <view class='flex-row'>
+          <view><text>课程标题：</text></view>
+          <view class="picker">
+          {{multiArray[1][multiIndex[1]]}}
+          </view>
+        </view>
+        </picker>
+      
+      </view>
+    </view>
+    <view class='flex-row'>
+      <view><text>课程价格：</text></view>
+      <view><input type="number" placeholder="单位元"></input></view>
+    </view>
+    <view class='flex-row'>
+      <view><text>课程描述：</text></view>
+      <view><input placeholder="听课的标题"></input></view>
+    </view>
+    <view class='flex-row'>
+      <view><text>回数标题：</text></view>
+      <view><input placeholder="课程回数的标题"></input></view>
+    </view>
+    <view class='flex-row'>
+      <view><text>背景图片：</text></view>
+      <view class="uploader">
+        <view class="uploader-text" bindtap="doUpload">
+            <text>上传图片</text>
+        </view>
+        <view class="uploader-container" wx:if="{{imgUrl}}">
+            <image
+                class="uploader-image"
+                src="{{imgUrl}}"
+                mode="aspectFit"
+                bindtap="previewImg"
+            ></image>
+        </view>
+      </view>
+    </view>
+    <view class='flex-row'>
+      <view><text>视频文件：</text></view>
+      <!-- <view><button>upload</button></view> -->
+      <view class="container">
+          <!-- <video src="{{src}}"></video> -->
+          <button bindtap="bindButtonTap">获取视频</button>
+      </view>
+
+    </view>
+    <view class='flex-row'>
+      <view><text>免费时间：</text></view>
+      <view><input placeholder="单位分"></input></view>
+    </view>
+    
+
+    <view style='padding-top:100rpx;'>
+    <button type='primary'>上传</button>
+    </view>
+  </view>
+
+</view>
+

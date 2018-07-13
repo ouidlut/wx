@@ -1,0 +1,3 @@
+<!--pages/weibo/weiboV.wxml-->
+<web-view src="{{wvSrc}}" mode="aspectFit"></web-view>
+

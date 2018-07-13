@@ -1,0 +1,50 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/addCgi/addCgi",
+    "pages/person/person",
+    "pages/listenlist/listen",
+    "pages/course/course",
+    "pages/courseCatalog/catalog",
+    "pages/courseDetail/detail",
+    "pages/manage/manage",
+    "pages/manage/list/list",
+    "pages/manage/change/change",
+    "pages/manage/course/course",
+    "pages/manage/addcourse/addcourse"
+  ],
+  "window": {
+    "backgroundColor": "#F6F6F6",
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#F6F6F6",
+    "navigationBarTitleText": "思得学院",
+    "navigationBarTextStyle": "black"
+  },
+  "tabBar": {
+    "color": "#000000",
+    "selectedColor": "#BF8600",
+    "borderStyle": "#ffffff",
+    "backgroundColor": "#f0fff0",
+    "position": "bottom",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "iconPath": "pages/images/footer_m1.png",
+        "selectedIconPath": "pages/images/footer_m1_hover.png",
+        "text": "首页"
+      },
+      {
+        "pagePath": "pages/course/course",
+        "iconPath": "pages/images/saving-book.png",
+        "selectedIconPath": "pages/images/saving-book_on.png",
+        "text": "课程"
+      },
+      {
+        "pagePath": "pages/person/person",
+        "iconPath": "pages/images/my_off.png",
+        "selectedIconPath": "pages/images/my_on.png",
+        "text": "个人中心"
+      }
+    ]
+  }
+}

@@ -1,0 +1,23 @@
+<view class="page">
+  
+  <view class="lrc" style="margin-top:{{marginTop}}px;height:{{lrcHeight}}px">
+    <block wx:for="{{lry}}" wx:key="">
+      <view class="lry {{currentIndex == index ? 'currentTime' : ''}}">{{item[1]}}</view>
+    </block>
+  </view>
+  <image class="pic_sig" src="{{pic}}"></image>
+  <view class="bottom">
+    <view class="state">
+      <image class="state_chose" bindtap="before" src="../images/pre.png"></image>
+      <image class="state_play" bindtap="playAndPause" src="{{isPlaying ? '../images/pause.png' : '../images/play.png'}}"></image>
+      <image class="state_chose" bindtap="next" src="../images/next.png"></image>
+    </view>
+    <view class="controller">
+      <text class="time-start">{{songState.currentPosition}}</text>
+      <view class="time-bar">
+        <view class="time-play" style="transform: translateX({{songState.progress}}%)"></view>
+      </view>
+      <text class="time-total">{{songState.duration}}</text>
+    </view>
+  </view>
+</view>

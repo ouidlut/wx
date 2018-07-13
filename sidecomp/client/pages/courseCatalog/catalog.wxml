@@ -1,0 +1,136 @@
+<!--pages/courseCatalog/catalog.wxml-->
+<scroll-view scroll-y="true" height="100%">
+  <!--表头图片  start-->
+   <view >
+    <image class='flex-cell-Image-title' src='{{title_src}}'  mode="scaleToFill"></image>
+  </view> 
+  <!--表头图片  end-->
+  <view class='flex-row'>
+    <view class='flex-column'>  
+      <view class='flex-row'>
+        <view style='width: 80%;'>
+          <text>{{title}}</text>
+        </view>
+        <view class='flex-cell-Image-s' style='padding-top:10rpx;' bindtap='bindWechatPay'  data-type="{{title}}" data-typeid="{{id}}">
+          <image src='../images/present.png' mode='aspectFit'></image>
+        </view>
+      </view>
+      <view>
+        <text style='font-size: 32rpx;'>{{descrition}}</text>
+      </view>
+      <view>
+        <text style='font-size: 28rpx;'>{{lastUpdate}}</text>
+      </view>
+    </view>
+  </view>
+  
+  <view class='line'>
+  </view>
+  
+  <block wx:for="{{courseList}}" wx:for-item="item" wx:key="index">
+    <view class='flex-column' style='padding-left:20rpx;' bindtap='bindTabContent'  data-type="{{item.id}}" data-typeid="{{itemS.id}}">
+      <view >
+        <!-- <video class='flex-cell-vadio' id="myVideo" src="{{item.video_src}}" binderror="videoErrorCallback" ></video> -->
+      </view>
+      <view class='flex-cell-Text' style='padding-top:20rpx; padding-bottom:10rpx'>
+        <text>{{item.video_title}}</text>
+      </view>
+      <view class='flex-row' style='padding-top:15rpx;'>
+        <view  class='flex-row'>
+          <view class='flex-cell-Image-ss'>
+          <image src='../images/plays.png' mode='aspectFit'></image>
+          </view>
+          <view class='flex-cell-Text-ss'>
+          <text>{{item.video_play}}</text>
+          </view>
+        </view>
+        <view  class='flex-row'>
+          <view class='flex-cell-Image-ss'>
+          <image src='../images/talks.png' mode='aspectFit'></image>
+          </view>
+          <view class='flex-cell-Text-ss'>
+          <text>{{item.video_comment}}</text>
+          </view>
+
+        </view>
+        <view style='padding-left:100rpx;'>
+            <text class='shiting-text'>{{item.video_free}}</text>
+        </view>
+      </view>
+      <!-- <view class='flex-column'>
+        <view class='flex-row'>
+          <view class='flex-cell-Image-rl'>
+            <image src='../images/my_on.png' mode='aspectFit'></image>
+          </view>
+          <view class='flex-column' style='padding-left:10rpx;'>
+            <view>
+              <text style='color:dodgerblue' class='flex-cell-cm-Text'>巴九灵</text>
+            </view>  
+            <view style='padding-top:20rpx;' class='flex-cell-cm-Text'>
+            棒棒糖，我要棒棒糖
+            </view>        
+            <view>
+              <text style='font-size: 16rpx;'>15小时前</text>
+            </view>        
+          </view>
+        </view>
+        <view class='flex-row'>
+          <view class='flex-cell-Image-rl'>
+            <image src='../images/my_on.png' mode='aspectFit'></image>
+          </view>
+          <view class='flex-column' style='padding-left:10rpx;'>
+            <view>
+              <text style='color:dodgerblue' class='flex-cell-cm-Text'>巴九灵</text>
+            </view>  
+            <view style='padding-top:20rpx;' class='flex-cell-cm-Text'>
+            棒棒糖，我要棒棒糖
+            </view>        
+            <view>
+              <text style='font-size: 16rpx;'>15小时前</text>
+            </view>        
+          </view>
+        </view>
+        <view class='flex-row'>
+          <view class='flex-cell-Image-rl'>
+            <image src='../images/my_on.png' mode='aspectFit'></image>
+          </view>
+          <view class='flex-column' style='padding-left:10rpx;'>
+            <view>
+              <text style='color:dodgerblue' class='flex-cell-cm-Text'>巴九灵</text>
+            </view>  
+            <view style='padding-top:20rpx;' class='flex-cell-cm-Text'>
+              给你棒棒糖
+            </view>        
+            <view>
+              <text style='font-size: 16rpx;'>15小时前</text>
+            </view>        
+          </view>
+        </view>
+      </view> -->
+      <!-- <view class="flex-row">
+        <view class="textarea-wrp">
+          <textarea bindblur="bindTextAreaBlur" auto-height placeholder="说说你的看法……"/>
+        </view>
+        <view>
+          <button open-type="getUserInfo" style='font-size: 25rpx; ' lang="zh_CN" bindgetuserinfo="onGotUserInfo">发表</button>
+        </view>
+      </view> -->
+
+    </view>
+  </block>
+      <view>
+        <text>　</text>
+      </view>
+      <view>
+        <text>　</text>
+      </view>
+      <view>
+        <text>　</text>
+      </view>
+    <view class='address-list address-add' style="height:{{view.Height}}rpx;">
+    <view style='width:100%;'>
+      <button type="primary" bindtap='bindViewPingLun' hover-class="button-hover" open-type="getUserInfo" bindgetuserinfo="userInfoHandler" ><text class='button-Text'>{{view.ButtonValue}}</text></button>
+    </view> 
+  </view>
+</scroll-view>
+

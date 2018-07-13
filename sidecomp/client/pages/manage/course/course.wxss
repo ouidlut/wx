@@ -1,0 +1,85 @@
+/* pages/manage/course/course.wxss */
+.flex-cell-Image-title{
+  width: 100%;
+  height: 300rpx;
+  color: #ffffff;
+  font-size: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+}
+.flex-row{
+  display: flex;
+  flex-direction: row;
+
+}
+.flex-column{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: stretch;
+}
+.line{
+  width:100%;
+  height:5rpx;
+  background:#aaa;
+}
+
+.flex-cell-Image-s{
+  width: 80rpx;
+  height: 80rpx;
+  color: #ffffff;
+  font-size: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+
+}
+
+.flex-row{
+  display: flex;
+  flex-direction: row;
+
+}
+.flex-column{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: stretch;
+}
+.line{
+  width:98%;
+  height:2rpx;
+  background:#aaa;
+}
+
+.flex-cell-Image-ss{
+  width: 50rpx;
+  height: 50rpx;
+  color: #ffffff;
+  font-size: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+
+}
+.flex-cell-Text-ss{
+  /* padding-left:10rpx; */
+  /* padding-top:10rpx; */
+  font-size: 26rpx
+}
+.flex-cell-Text-s{
+  /* padding-left:30rpx;
+  padding-top:10rpx; */
+  font-size: 30rpx
+}
+.btn {
+  width: 90%;
+  margin-top: 30rpx;
+  background-color: #FFCC00;
+  color: #FFF;
+  font-size: 26rpx;
+}

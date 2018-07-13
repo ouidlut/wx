@@ -1,0 +1,7 @@
+<block wx:for="{{singerList}}" wx:key="">
+    <view class="singer_item" bindtap="hotTap" data-artist_id="{{item.artist_id}}" data-ting_uid="{{item.ting_uid}}" data-pic="{{item.avatar_big}}">
+        <image src="{{item.avatar_big}}"></image>
+        <view class="singerNmae">{{item.name}}</view>
+        <view class="right_arrow singerrow"></view>
+    </view>
+</block>

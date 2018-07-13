@@ -1,0 +1,65 @@
+/* pages/person/person.wxss */
+.flex-row{
+  display: flex;
+  flex-direction: row;
+
+}
+.flex-column{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: stretch;
+}
+.flex-cell-Image{
+  width: 150rpx;
+  height: 150rpx;
+  color: #ffffff;
+  font-size: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+}
+.flex-cell-Text{
+  width: 60%;
+  height: 200rpx;
+  color: #ffffff;
+  font-size: 26rpx;   
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.view-bak-set{
+    width: 100%;
+    height: 100px;
+    /* background: url('../images/book.png') no-repeat; */
+    background-size: 100% 100%;
+    background:cornflowerblue;
+}
+.css3-elipse{
+	width: 200px;
+	height: 100px;
+	border-radius: 40%;
+	background-color:mintcream;
+   /* color: #ffffff;  */
+}
+.css3-elipse-Vip{
+	width: 200px;
+	height: 100px;
+	border-radius: 40%;
+	background-color:crimson;
+  color: #ffffff;
+}
+
+.shopping-Text{
+  /* width: 60%;
+  height: 200rpx;
+  color: #ffffff; */
+  font-size: 30rpx;
+  padding-left:40rpx;
+  padding-top: 15rpx;
+  padding-bottom: 15rpx;
+  /* display: flex;
+  justify-content: center;
+  align-items: center; */
+}

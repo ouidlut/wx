@@ -1,0 +1,15 @@
+<view class="page">
+  <image class="headImg" src="{{headImg}}"></image>
+  <view class="section_title">共{{dataList.length}}首歌</view>
+  <block wx:for="{{dataList}}" wx:key="">
+    <view class="list_section" bindtap="songPlay" data-id="{{item.song_id}}" data-songindex="{{index}}">
+    <view>
+        {{index + 1}}
+    </view>
+      <view>
+        <view class="name">{{item.title}}</view>
+        <view class="author">{{item.author}}</view>
+      </view>
+    </view>
+  </block>
+</view>

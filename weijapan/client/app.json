@@ -1,0 +1,54 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/recommond/recommond",
+    "pages/coupon/coupon",
+    "pages/tablist/tablist",
+    "pages/speciallist/list",
+    "pages/detail/detail",
+    "pages/htmldetail/htmldetail",
+    "pages/recomdetail/recomdetail",
+    "pages/wvOpen/largeView",
+    "pages/weibo/weiboV"
+  ],
+  "window": {
+    "backgroundColor": "#F6F6F6",
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#F8F8F8",
+    "navigationBarTitleText": "web-view",
+    "navigationBarTextStyle": "black"
+  },
+  "tabBar": {
+    "color": "#000000",
+    "selectedColor": "#BF8600",
+    "borderStyle": "#ffffff",
+    "backgroundColor": "#f0fff0",
+    "position": "bottom",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "iconPath": "images/topBar/footer_m1.png",
+        "selectedIconPath": "images/topBar/footer_m1_hover.png",
+        "text": "首页"
+      },
+      {
+        "pagePath": "pages/recommond/recommond",
+        "iconPath": "images/topBar/footer_m2.png",
+        "selectedIconPath": "images/topBar/footer_m2_hover.png",
+        "text": "特别推荐"
+      },
+      {
+        "pagePath": "pages/speciallist/list",
+        "iconPath": "images/topBar/footer_m3.png",
+        "selectedIconPath": "images/topBar/footer_m3_hover.png",
+        "text": "专辑"
+      },
+      {
+        "pagePath": "pages/coupon/coupon",
+        "iconPath": "images/topBar/footer_m4.png",
+        "selectedIconPath": "images/topBar/footer_m4_hover.png",
+        "text": "优惠券"
+      }
+    ]
+  }
+}

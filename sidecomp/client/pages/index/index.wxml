@@ -1,0 +1,135 @@
+<scroll-view scroll-y="true" height="100%">
+  <!--表头图片  start-->
+  <view >
+    <image class='flex-cell-Image-title' src='../images/listenH.png'  mode="scaleToFill"></image>
+  </view>
+  <!--表头图片  end-->
+
+  <!--音频播放区 stat -->
+  <view class='flex-column' style='padding-top:0rpx;'>
+    <view class="flex-row" >
+        <!-- // 左值展示，currentProcess -->
+        <text>{{currentProcess}}</text>    
+        <!-- // 进度条 -->
+        <slider
+        bindchange="hanleSliderChange"               
+          bindtouchstart="handleSliderMoveStart"
+          bindtouchend="handleSliderMoveEnd"
+          min="0"
+          max="{{slider_max}}"
+          activeColor="#8f7df0"
+          value="{{slider_now}}" style="width:75%;"/>      
+        <!-- // 右值展示，totalProcess -->
+        <text >{{totalProcess}}</text>
+    </view> 
+    <view class='flex-row' style='padding-left:30rpx;'>
+      <view class='flex-column' bindtap='bindToList'>
+        <image class='flex-cell-Image-s' src="../images/list_off.png"></image>
+        <text class='flex-cell-Text-s'>播放列表</text>
+      </view>
+      <!-- <view style='padding-left:20rpx;padding-top:25rpx;'>
+        <image class='flex-cell-Image-rl' src='../images/ooopic_l.png' mode="aspectFit"></image>
+      </view> -->
+      <!--当前为停止状态  -->  
+      <view style='padding-left:150rpx;'>
+        <!-- <audio id="myaudio" bindtimeupdate="onTimeUpdate"></audio> -->
+        <view  wx:if="{{isplay==false}}" bindtap='play'> 
+          <image class='flex-cell-Image' src='../images/ooopic_start.png' ></image>  
+        </view>  
+        <!--当前为播放状态  -->  
+        <view  wx:if="{{isplay==true}}" bindtap='stop'>  
+          <image class='flex-cell-Image' src='../images/ooopic_pause.png' ></image>  
+        </view>
+      </view> 
+      <!-- <view style='padding-left:80rpx;padding-top:25rpx;'>
+        <image class='flex-cell-Image-rl' src='../images/ooopic_r.png'></image>
+      </view> -->
+    </view>
+  </view>
+  <!--音频播放区 end -->
+  <!--评论开始-->
+  <view class='flex-column' style='padding-left:20rpx;'>
+
+    <view class='line'>
+    </view>
+  
+    <view>
+      <text>{{title}}</text>
+    </view>
+    <view class='flex-row'>
+      <view  class='flex-row'>
+        <view class='flex-cell-Image-ss'>
+        <image src='../images/plays.png' mode='aspectFit'></image>
+        </view>
+        <view class='flex-cell-Text-ss'>
+        <text>1.4万</text>
+        </view>
+      </view>
+      <view  class='flex-row'>
+        <view class='flex-cell-Image-ss'>
+        <image src='../images/talks.png' mode='aspectFit'></image>
+        </view>
+        <view class='flex-cell-Text-ss'>
+        <text>35</text>
+        </view>
+      </view>
+    </view>
+    <view>
+      <text style='font-size: 20rpx;'>2018-03-05 12:12:12</text>
+    </view>
+    <view class='line1'>
+    </view>
+    <!--コメント情報  -->
+    <view class='flex-column'>
+      <block wx:for="{{commentList}}" wx:for-item="item" wx:key="index">
+        <view class='flex-row'>
+          <view class='flex-cell-Image-rl'>
+            <image src='{{item.user_src}}' mode='aspectFit'></image>
+          </view>
+          <view class='flex-column' style='padding-left:10rpx;'>
+            <view>
+              <text style='color:dodgerblue;font-size: 30rpx;'>{{item.user_name}}</text>
+            </view>  
+            <view style='padding-top:20rpx;font-size: 29rpx;'>
+              {{item.user_comment}}
+            </view>
+            <view>
+              <text style='font-size: 16rpx;'>{{item.user_upd_date}}</text>
+            </view>
+          </view>
+        </view>
+      </block>    
+    </view>
+
+
+  </view>
+  <!--评论终了-->
+ 
+
+<text class='search_no'>关注我们</text>  
+<view class='view_img' >  
+<image class='flex-cell-Image' bindtap="previewImage" src='http://pmoe92330.pic31.websiteonline.cn/upload/jrhx.png'></image>
+
+</view>  
+ <view class='flex-row'>
+        <text>　</text>
+  </view>
+  <view class='flex-row'>
+        <text>　</text>
+  </view>
+  <view class='address-list flex-column address-add' style="height:{{view.Height}}rpx;">
+    <view style='width:100%;'>
+      <button bindtap='bindViewPingLun' style='background:{{view.ButtonColor}};'open-type="getUserInfo" bindgetuserinfo="userInfoHandler">{{view.ButtonValue}}</button>
+    </view> 
+     <view class='flex-row'>
+       <view style='width:80%;'> 
+       <!-- <input placeholder="说说你的看法……" />  -->
+            <textarea maxlength="100" placeholder="说说你的看法……" style='width:100%;'/>  
+       </view>   
+       <view style='width:20%'> 
+        <button >发表</button>
+       </view>      
+    </view> 
+  </view>
+
+</scroll-view>

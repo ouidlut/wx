@@ -1,0 +1,80 @@
+<!--pages/courseDetail/detail.wxml-->
+<scroll-view scroll-y="true" height="100%">
+  <!--表头图片  start-->
+   <view >
+    <image class='flex-cell-Image-title' src='{{title_src}}'  mode="scaleToFill"></image>
+  </view> 
+  <!--表头图片  end-->
+  <view class='flex-row'>
+    <view class='flex-column'>  
+      <view>
+        <text>{{courseDetail.video_title}}</text>
+      </view>
+      <view>
+        <text style='font-size: 30rpx;'>{{courseDetail.lastUpdate}}</text>
+      </view>
+    </view>
+  </view>
+   <view class='flex-column' >
+      <view >
+         <video class='flex-cell-vadio' id="myVideo" src="{{item.video_src}}" binderror="videoErrorCallback" ></video> 
+      </view>
+      <view class='flex-row' style='padding-top:15rpx;'>
+        <view  class='flex-row'>
+          <view class='flex-cell-Image-ss'>
+          <image src='../images/plays.png' mode='aspectFit'></image>
+          </view>
+          <view class='flex-cell-Text-ss'>
+          <text>{{courseDetail.video_play}}</text>
+          </view>
+        </view>
+        <view  class='flex-row'>
+          <view class='flex-cell-Image-ss'>
+          <image src='../images/talks.png' mode='aspectFit'></image>
+          </view>
+          <view class='flex-cell-Text-ss'>
+          <text>{{courseDetail.video_comment}}</text>
+          </view>
+
+        </view>
+        <view style='padding-left:100rpx;'>
+            <text class='shiting-text'>{{courseDetail.video_free}}</text>
+        </view>
+      </view>
+      <view class='flex-column'>
+        <block wx:for="{{commentList}}" wx:for-item="item" wx:key="index">
+          <view class='flex-row'>
+            <view class='flex-cell-Image-rl'>
+              <image src='{{item.icon}}' mode='aspectFit'></image>
+            </view>
+            <view class='flex-column' style='padding-left:10rpx;'>
+              <view>
+                <text style='color:dodgerblue' class='flex-cell-cm-Text'>{{item.name}}</text>
+              </view>  
+              <view style='padding-top:20rpx;' class='flex-cell-cm-Text'>
+              {{item.comment}}
+              </view>        
+              <view>
+                <text style='font-size: 16rpx;'>{{item.lastTime}}</text>
+              </view>        
+            </view>
+          </view>
+        </block>
+      </view>
+      <view class="flex-row">
+        <view class="textarea-wrp">
+          <textarea bindblur="bindTextAreaBlur" auto-height placeholder="说说你的看法……"/>
+        </view>
+        <view>
+          <button open-type="getUserInfo" style='font-size: 25rpx; ' lang="zh_CN" bindgetuserinfo="onGotUserInfo">发表</button>
+        </view>
+      </view>
+
+    </view>
+    <view class='address-list address-add' style="height:{{view.Height}}rpx;">
+    <view style='width:100%;'>
+      <button type="primary" bindtap='bindViewPingLun' hover-class="button-hover" open-type="getUserInfo" bindgetuserinfo="userInfoHandler" ><text class='button-Text'>{{view.ButtonValue}}</text></button>
+    </view> 
+  </view>
+</scroll-view>
+

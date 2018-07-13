@@ -1,0 +1,68 @@
+/* pages/course/course.wxss */
+.weui-cells{
+  margin-top: 80rpx;
+  text-align: left;
+}
+.weui-label{
+  width: 5em;
+}
+
+.page-body-button {
+  margin-bottom: 30rpx;
+}
+.flex-cell-Image-title{
+  width: 100%;
+  height: 300rpx;
+  color: #ffffff;
+  font-size: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+}
+
+.flex-cell-Image-s{
+  width: 80rpx;
+  height: 80rpx;
+  color: #ffffff;
+  font-size: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+
+}
+
+.flex-row{
+  display: flex;
+  flex-direction: row;
+
+}
+.flex-column{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: stretch;
+}
+.line{
+  width:98%;
+  height:2rpx;
+  background:#aaa;
+}
+
+.flex-cell-Image-ss{
+  width: 50rpx;
+  height: 50rpx;
+  color: #ffffff;
+  font-size: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+
+}
+.flex-cell-Text-ss{
+  padding-left:30rpx;
+  padding-top:10rpx;
+  font-size: 26rpx
+}

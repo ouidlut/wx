@@ -1,0 +1,88 @@
+<!--pages/manage/addcourse/addcourse.wxml-->
+<scroll-view>
+    <view style='padding-left:10rpx;'>
+      <view class='flex-coloum' style='padding-top:20rpx;'>
+      <view class='flex-row'>
+        <view><text class='flex-cell-Text-ss'>科目名字：</text></view>
+        <picker class='flex-cell-Text-ss' bindchange="bindPickerChange" value="{{index}}" range="{{array}}">
+          <view class="picker">
+            {{array[index]}}
+          </view>
+        </picker>
+      </view>
+        <view class='flex-row'>
+          <view><text class='flex-cell-Text-ss'>表头图片：</text></view>
+          <view class="uploader">
+            <view bindtap="doUpload">
+                <text class='flex-cell-Text-ss' style='font-color:blue'>上传图片</text>
+            </view>
+            <view class="uploader-container" wx:if="{{imgUrl}}">
+                <image
+                    class="uploader-image"
+                    src="{{imgUrl}}"
+                    mode="aspectFit"
+                    bindtap="previewImg"
+                ></image>
+            </view>
+          </view>
+        </view>
+      </view>
+      <view class='line' ></view>
+      <view class='flex-row' style='padding-top:10rpx;'>
+        <view><text class='flex-cell-Text-ss'>课程名字：</text></view>
+        <view>
+          <input  class='flex-cell-Text-ss' type='text' placeholder="课程的名字"></input>
+        </view>
+        
+      </view>
+        <view class='flex-row'>
+          <view><text class='flex-cell-Text-ss' >表头图片：</text></view>
+          <view class="uploader">
+            <view bindtap="doUpload">
+                <text class='flex-cell-Text-ss' style='font-color:blue'>上传图片</text>
+            </view>
+            <view class="uploader-container" wx:if="{{imgUrl}}">
+                <image
+                    class="uploader-image"
+                    src="{{imgUrl}}"
+                    mode="aspectFit"
+                    bindtap="previewImg"
+                ></image>
+            </view>
+          </view>
+        </view>
+
+
+      <view class='flex-row'>
+        <view><text class='flex-cell-Text-ss'>课程介绍：</text></view>
+        <view>
+          <!-- <input class='flex-cell-Text-ss' type='text' placeholder="课程PR"></input> -->
+          <textarea class='flex-cell-Text-ss' placeholder="课程PR"  style=" width: 550rpx; height: 200rpx;"></textarea>
+        </view>
+
+      </view>
+      <view>
+            <view bindtap="doUpload">
+                <text class='flex-cell-Text-ss' style='font-color:blue'>课程PR图片</text>
+            </view>
+            <view class="uploader-container" wx:if="{{imgUrl}}">
+                <image
+                    class="uploader-image"
+                    src="{{imgUrl}}"
+                    mode="aspectFit"
+                    bindtap="previewImg"
+                ></image>
+            </view>
+ 
+      </view>
+      <view class='flex-row'>
+        <view><text class='flex-cell-Text-ss'>课程费用：</text></view>
+        <view>
+          <input type='number' placeholder="单位元" class='flex-cell-Text-ss'></input>
+        </view>
+        
+      </view>
+    </view>
+
+
+</scroll-view>

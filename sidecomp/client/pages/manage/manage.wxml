@@ -1,0 +1,41 @@
+<!--pages/manage/manage.wxml-->
+  <!--表头图片  start-->
+  <view >
+    <image class='flex-cell-Image-title' src='../images/5kv6.jpg'  mode="scaleToFill"></image>
+  </view>
+  <view style='padding-top:50rpx;padding-left:30rpx; padding-bottom:50rpx;'>
+    <view>
+      <text>听课管理</text>
+    </view>
+    <view class='flex-column' style='font-size:30rpx; padding-top:20rpx;padding-left:20rpx;'>
+      <text>最新上传时间：2018/06/25 18:20</text>
+      <text>扎实学好英语词汇、语法，培养阅读能力</text>
+    </view>
+    <view class='flex-row' style='padding-top:20rpx;'>
+      <button type="primary" bindtap="bindListL" style='width:250rpx;'> 一览表示 </button>
+      <button type="primary" bindtap="bindChangeL" style='width:250rpx;'> 上传 </button>
+    </view>
+  </view>
+  <view class='line' >
+  </view>
+
+  <view style='padding-top:50rpx;padding-left:30rpx;'>
+    <view>
+      <text>综合课程管理</text>
+    </view>  
+    <view class='flex-column' style='font-size:30rpx; padding-top:20rpx;padding-left:20rpx;'>
+      <text>最新上传时间：2018/06/25 18:20</text>
+      <text>科目：日语课</text>
+      <text>课程：中级日语</text>
+      <text>第29回讲座</text>
+    </view>
+    <view class='flex-row' style='padding-top:20rpx;'>
+      <button type="primary" bindtap="bindListV" style='width:250rpx;'> 一览表示 </button>
+      <button type="primary" bindtap="bindChangeV" style='width:250rpx;'> 上传 </button>
+    </view>
+    <view class='flex-row' style='padding-top:20rpx;'>
+      <button type="primary" bindtap="bindTapClass" style='width:250rpx;'> 科目管理 </button>
+
+    </view>
+  </view>
+  <!--表头图片  end-->

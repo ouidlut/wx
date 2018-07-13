@@ -1,0 +1,154 @@
+<!--pages/manage/course/course.wxml-->
+  <!--表头图片  start-->
+  <view >
+    <image class='flex-cell-Image-title' src='../../images/5kv6.jpg'  mode="scaleToFill"></image>
+  </view>
+  <view style='padding-top:50rpx;padding-left:10rpx;'>
+    <view>
+      <text>科目管理</text>
+    </view>  
+
+    <block wx:for="{{list}}" wx:for-item="item" wx:key="index">
+      <view style='padding-top:10rpx;'>
+        <view  class='flex-row'> 
+          <view>
+            <image class='flex-cell-Image-s' src='{{item.icon}}'  mode="aspectFit"></image>
+          </view>
+          <view>
+            <text >{{item.km}}</text>
+          </view>
+        </view>
+        <block wx:for="{{item.kc}}" wx:for-item="itemS" wx:key="indexS">
+          <view  class='flex-row' style='padding-left:30rpx;' bindtap="bindTabCourse" data-type="{{item.video_title}}" data-typeid="{{item.id}}"> 
+            <view>
+              <image class='flex-cell-Image-ss' src='{{itemS.Icon}}'  mode="aspectFit"></image>
+            </view>
+            <view>
+              <text class='flex-cell-Text-ss' >{{itemS.title}}</text>
+            </view>
+          </view>
+        </block>   
+      </view>
+      <view class='line'></view>
+    </block>
+  </view>
+
+    
+  <modal title="追加科目" cancel-text="关闭" height='60%' confirm-text="确定" hidden="{{mHidden}}" bindconfirm="changeModel" bindcancel="modelCancel" > 
+      <view class='flex-row'>
+        <view><text class='flex-cell-Text-s'>科目名字：</text></view>
+        <view>
+          <input type='text' placeholder="科目的名字" class='flex-cell-Text-s'></input>
+        </view>
+      </view>
+
+      <view class='flex-row'>
+        <view><text class='flex-cell-Text-s'>表头图片：</text></view>
+        <view class="uploader">
+          <view class="uploader-text" bindtap="doUpload">
+              <text class='flex-cell-Text-s'>上传图片</text>
+          </view>
+          <view class="uploader-container" wx:if="{{imgUrl}}">
+              <image
+                  class="uploader-image"
+                  src="{{imgUrl}}"
+                  mode="aspectFit"
+                  bindtap="previewImg"
+              ></image>
+          </view>
+        </view>
+      </view>
+
+  </modal>
+    <modal title="追加课程" cancel-text="关闭" confirm-text="确定" hidden="{{kcHidden}}" bindconfirm="changeModel" bindcancel="modelCancel" > 
+
+        <view style='padding-left:10rpx;'>
+          <view class='flex-coloum' style='padding-top:20rpx;'>
+          <view class='flex-row'>
+            <view><text class='flex-cell-Text-ss'>科目名字：</text></view>
+            <picker bindchange="bindPickerChange" value="{{index}}" range="{{array}}">
+              <view class="picker">
+                {{array[index]}}
+              </view>
+            </picker>
+          </view>
+            <view class='flex-row'>
+              <view><text >表头图片：</text></view>
+              <view class="uploader">
+                <view bindtap="doUpload">
+                    <text style='font-color:blue'>上传图片</text>
+                </view>
+                <view class="uploader-container" wx:if="{{imgUrl}}">
+                    <image
+                        class="uploader-image"
+                        src="{{imgUrl}}"
+                        mode="aspectFit"
+                        bindtap="previewImg"
+                    ></image>
+                </view>
+              </view>
+            </view>
+          </view>
+          <view class='line' ></view>
+          <view class='flex-row' style='padding-top:10rpx;'>
+            <view><text>课程名字：</text></view>
+            <view>
+              <input type='text' placeholder="课程的名字"></input>
+            </view>
+            
+          </view>
+            <view class='flex-row'>
+              <view><text >表头图片：</text></view>
+              <view class="uploader">
+                <view bindtap="doUpload">
+                    <text style='font-color:blue'>上传图片</text>
+                </view>
+                <view class="uploader-container" wx:if="{{imgUrl}}">
+                    <image
+                        class="uploader-image"
+                        src="{{imgUrl}}"
+                        mode="aspectFit"
+                        bindtap="previewImg"
+                    ></image>
+                </view>
+              </view>
+            </view>
+
+
+          <view class='flex-row'>
+            <view><text class='flex-cell-Text-ss'>课程介绍：</text></view>
+            <view>
+              <!-- <input class='flex-cell-Text-ss' type='text' placeholder="课程PR"></input> -->
+              <textarea placeholder="课程PR" placeholder-style="color:red;" style=" width: 250rpx; height: 100rpx;"></textarea>
+            </view>
+
+              <view class="uploader">
+                <view bindtap="doUpload">
+                    <text style='font-color:blue'>上传图片</text>
+                </view>
+                <view class="uploader-container" wx:if="{{imgUrl}}">
+                    <image
+                        class="uploader-image"
+                        src="{{imgUrl}}"
+                        mode="aspectFit"
+                        bindtap="previewImg"
+                    ></image>
+                </view>
+              </view>
+
+          </view>
+          
+          <view class='flex-row'>
+            <view><text class='flex-cell-Text-ss'>课程费用：</text></view>
+            <view>
+              <input type='number' placeholder="课程费用" class='flex-cell-Text-ss'></input>
+            </view>
+            
+          </view>
+        </view>
+
+
+  </modal>
+      <button type='default' bindtap="btnTap">科目</button>
+      <button type='default' bindtap="btnKCTap">课程</button>
+

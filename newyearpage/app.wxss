@@ -1,0 +1,31 @@
+/**app.wxss**/
+
+.page {
+  width: 100%;
+  height: 100%;
+  background-color: #fff;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 34rpx;
+  overflow: auto;
+  overflow-x: hidden;
+}
+.section_title {
+    background-color: #F6F6F6;
+    height: 64rpx;
+    line-height: 64rpx;
+    width: 100%;
+    padding-left: 30rpx;
+}
+.right_arrow {
+    margin-top: 70rpx;
+    position: absolute;
+    display: inline-block;
+    /*flex: none;*/
+    margin-right: 10rpx;
+    margin-left: 20rpx;
+    width: 12rpx;
+    height: 12rpx;
+    border-right: 1px solid #b2b2b2;
+    border-bottom: 1px solid #b2b2b2;
+    transform: rotate(-45deg);
+}

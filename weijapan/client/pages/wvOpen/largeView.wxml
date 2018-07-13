@@ -1,0 +1,5 @@
+<!--pages/wvOpen/largeView.wxml-->
+<!-- <web-view src="{{wvSrc}}"></web-view> -->
+<view>
+<image  src="{{wvSrc}}"></image>
+</view>

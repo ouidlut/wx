@@ -1,0 +1,36 @@
+/* pages/manage/list/list.wxss */
+.flex-cell-Image-title{
+  width: 100%;
+  height: 300rpx;
+  color: #ffffff;
+  font-size: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+}
+.line{
+  width:95%;
+  height:2rpx;
+  background:#aaa;
+}
+.flex-cell-Text-ss{
+  font-size: 28rpx;   
+  display: flex;
+  /* justify-content: center; */
+  /* align-items: center; */
+   padding-left:15rpx;
+   padding-top: 15rpx;
+   padding-bottom: 15rpx;
+}
+.flex-row{
+  display: flex;
+  flex-direction: row;
+
+}
+.flex-column{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: stretch;
+}

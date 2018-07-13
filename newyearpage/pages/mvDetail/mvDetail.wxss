@@ -1,0 +1,8 @@
+/* pages/mvDetail/mvDetail.wxss */
+.video {
+    width: 100%;
+}
+.video_bg {
+    height: 600rpx;
+    width: 100%;
+}

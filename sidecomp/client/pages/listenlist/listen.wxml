@@ -1,0 +1,22 @@
+<!--pages/listenlist/listen.wxml-->
+<!-- <view class="view" style="width:{{view.Width}}px;height:{{view.Height}}px;"
+>我是view标签，我现在的宽度是{{view.Width}}px,高度是{{view.Height}}px</view>
+<input placeholder="输入view标签的宽度" bindinput="viewWidth"></input>
+<input placeholder="输入view标签的高度" bindinput="viewHeight"></input>
+ -->
+<scroll-view scroll-y="true" height="100%">
+  <!--表头图片  start-->
+  <view >
+    <image class='flex-cell-Image-title' src='../images/listenH.png'  mode="scaleToFill"></image>
+  </view>
+  <!--表头图片  end-->
+  <block wx:for="{{listenList}}" wx:for-item="item" wx:key="index">
+    <view class='flex-cell-Text-ss'>
+      <text>{{item.title}}</text>
+    </view>
+    <view class='line'>
+    </view>
+  </block>
+  
+
+</scroll-view>

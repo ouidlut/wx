@@ -1,0 +1,22 @@
+.singer_item {
+    width: 100%;
+    height: 180rpx;
+    border-bottom: 1rpx solid #DCDCDC;
+    margin: 20rpx;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+.singer_item image {
+    width: 130rpx;
+    height: 160rpx;
+}
+.singerNmae {
+    margin-left: 30rpx;
+}
+.singerrow {
+    position: absolute;
+    right: 30rpx;
+    margin-top: -10rpx;
+    display: inline-block;
+}

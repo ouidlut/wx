@@ -1,0 +1,18 @@
+<!--pages/manage/list/list.wxml-->
+<view >
+<text style='display: flex;justify-content: center;align-items: center;width:100%'>
+{{title}}
+</text>
+</view>
+
+  <block wx:for="{{listenList}}" wx:for-item="item" wx:key="index">
+    <view class='flex-row flex-cell-Text-ss'>
+      <navigator url="/pages/manage/change/change" hover-class="navigator-hover" style='padding-top:0rpx;padding-right:10rpx;color:blue;'>修改</navigator>
+      <view style='padding-top:0rpx;padding-right:10rpx;color:blue;'>
+      <text>删除</text>
+      </view>
+      <text>{{item.title}}</text>
+    </view>
+    <view class='line'>
+    </view>
+  </block>

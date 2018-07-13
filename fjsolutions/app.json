@@ -1,0 +1,47 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/recommond/recommond",
+    "pages/coupon/coupon",
+    "pages/speciallist/list"
+  ],
+  "window": {
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#F8F8F8",
+    "navigationBarTitleText": "web-view",
+    "navigationBarTextStyle": "black"
+  },
+  "tabBar": {
+    "color": "black",
+    "selectedColor": "#BF8600",
+    "borderStyle": "white",
+    "backgroundColor": "white",
+    "position": "bottom",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "iconPath": "images/ba.png",
+        "selectedIconPath": "images/ba_active.png",
+        "text": "首页"
+      },
+      {
+        "pagePath": "pages/recommond/recommond",
+        "iconPath": "images/cart.png",
+        "selectedIconPath": "images/cart_active.png",
+        "text": "特别推荐"
+      },
+      {
+        "pagePath": "pages/speciallist/list",
+        "iconPath": "images/cart.png",
+        "selectedIconPath": "images/cart_active.png",
+        "text": "专辑"
+      },
+      {
+        "pagePath": "pages/coupon/coupon",
+        "iconPath": "images/cart.png",
+        "selectedIconPath": "images/cart_active.png",
+        "text": "优惠券"
+      }
+    ]
+  }
+}

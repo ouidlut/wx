@@ -1,0 +1,61 @@
+<!--pages/recomdetail/recomdetail.wxml-->
+<scroll-view scroll-y="true" height="100%">
+  <!--loading......-->
+  <view wx:if="{{!detailinfo}}">
+    <view class="offline-notice">正在加载中，请稍等...</view>
+  </view>
+  <!--no data......-->
+  <!-- <view wx:elif="{{detailinfo.length === 0}}">
+    <view class="offline-notice">没有商品</view>
+  </view> -->
+  <!--display data......-->
+  <view wx:elif="{{detailinfo.length > 0}}">
+    <view class="item-container">
+      <view  class="flex-column">
+        <view class="flex-row " >
+          <view class="flex-row flex-cell-Image">
+            <image src="{{detailinfo[0].pic_url_list[0]}}" mode="aspectFit"></image>
+          </view>
+          <view class="flex-row">
+            <view class="flex-column title-text">
+              <text  >{{detailinfo[0].bland_nm}}</text>
+            </view>
+          </view>              
+        </view>
+
+        <view>
+          <text class='text'>{{detailinfo[0].mini_title}}</text>
+        </view>
+        
+        <!-- <view  class="flex-column"> -->
+        <block wx:for="{{detailinfo[0].pic_url_list}}" wx:for-index="idx" wx:for-item="slide" wx:key="id">
+          <view wx:if="{{idx%3==0}}">
+            <view  class="flex-column ">
+                <!--1 ROW  -->
+                <view class="flex-row " >
+                  <view class="flex-row flex-cell-Image2" bindtap="bindTapProduct" data-type="{{slide+',' + detailinfo[0].bland_nm}}" >
+                    <image src="{{slide}}" mode="aspectFit"/>
+                  </view>
+                <!--2 ROW  -->
+                  <view wx:if="{{idx < detailinfo[0].pic_url_list.length-2}}">
+                    <view class="flex-row flex-cell-Image2" bindtap="bindTapProduct" data-type="{{detailinfo[0].pic_url_list[idx+1]+',' + detailinfo[0].bland_nm}}" >
+                      <image src="{{detailinfo[0].pic_url_list[idx+1]}}" mode="aspectFit"/>
+                    </view>
+                  </view>
+                 <!--3 ROW  -->
+                  <view wx:if="{{idx < detailinfo[0].pic_url_list.length-3}}">
+                    <view class="flex-row flex-cell-Image2" bindtap="bindTapProduct" data-type="{{detailinfo[0].pic_url_list[idx+2] +',' + detailinfo[0].bland_nm}}">
+                      <image src="{{detailinfo[0].pic_url_list[idx+2]}}" mode="aspectFit"/>
+                    </view>
+                  </view>
+                </view>
+            </view>
+          </view>
+        </block>
+
+
+      </view>
+    </view>
+  </view>
+
+</scroll-view>

@@ -1,0 +1,16 @@
+{
+  "pages":[
+    "pages/homePage/homePage",
+    "pages/songDetail/songDetail",
+    "pages/singerList/singerList",
+    "pages/songSort/songSort",
+    "pages/mvDetail/mvDetail",
+    "pages/songPlay/songPlay"
+  ],
+  "window":{
+    "backgroundTextStyle":"light",
+    "navigationBarBackgroundColor": "#be241c",
+    "navigationBarTitleText": "听我爱听",
+    "navigationBarTextStyle":"white"    
+  }
+}

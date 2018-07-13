@@ -1,0 +1,26 @@
+.headImg {
+    width: 100%;
+    height: 340rpx;
+}
+.list_section {
+    height: 138rpx;
+    width: 100%;
+    border-bottom: 1px solid #DCDCDC;
+    text-indent: 30rpx;
+}
+.name {
+    margin-top: 20rpx;
+    height: 60rpx;
+    line-height: 30rpx;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}
+.author {
+    height: 30rpx;
+    line-height: 30rpx;
+    color: #858585;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}

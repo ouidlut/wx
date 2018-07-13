@@ -1,0 +1,1502 @@
+--#====================================================================================================
+--#  (株FJS                        TMシステム
+--#  PACKAGE NAME         :        PRC_REBUILD_T001
+--#
+--#  DESCRIPTION          :        顧客情報を作成する処理(TRG_T001_BIZ_CUST_BEFOREを参照すること)
+--#
+--#  Copyright (C)        :        
+--#
+--#  VERSION              :        1.0
+--#
+--#  PROGRAM LIST
+--#   ----------------------------------    --------------------------------------------------
+--#  PROGRAM NAME                           DESCRIPTION
+--#   ----------------------------------    --------------------------------------------------
+--#
+--#
+--#  CHANGE HISTORY
+--#   ----------        --------------------------------------------------        ------------
+--#   DATE              DESCRIPTION                                               AUTHOR
+--#   ----------        --------------------------------------------------        ------------
+--#   
+--#
+--#   =================================================================================================
+CREATE OR REPLACE FUNCTION PUBLIC.PRC_REBUILD_T001
+(
+        P_CHANE_TYPE        IN    VARCHAR,                                   --操作区分
+        T001_TABLE          IN    T001_BIZ_CUST                              --T001
+        
+) RETURNS integer  AS $$
+DECLARE
+    --# 戻り値定数
+    C_RET_OK                     CONSTANT    NUMERIC   := 0;        --正常終了
+    C_RET_NG                     CONSTANT    NUMERIC   := -1;       --異常終了
+    C_TYT001_TABLE.INSERT                 CONSTANT    VARCHAR(1) := 'I';   --操作区分(INSERT)
+    C_TYT001_TABLE.DELETE                 CONSTANT    VARCHAR(1) := 'D';   --操作区分(DELETE)
+    C_TYT001_TABLE.UPDATE                 CONSTANT    VARCHAR(1) := 'U';   --操作区分(UPDATE)
+    OLD_BIZ_CUST                 T001_BIZ_CUST%ROWTYPE;            --古い顧客情報
+    
+BEGIN
+    --■操作区分のチェック
+    BEGIN
+        IF P_CHANE_TYPE NOT IN (C_TYT001_TABLE.INSERT, C_TYT001_TABLE.DELETE, C_TYT001_TABLE.UPDATE) THEN
+            N_RET := C_RET_NG;                                   --戻り値を異常終了に設定すること
+            ----DBMS_OUTPUT.PUT_LINE('操作区分:'  || T001_TABLE.CHANE_TYPE ); --操作区分の出力
+            --RAISE EX_CHANE_TYPE;
+            RAISE EXCEPTION '操作区分 --> %', P_CHANE_TYPE USING HINT = '異常値です。';
+        END IF;
+        V_CHANE_TYPE := T001_TABLE.CHANE_TYPE; --操作区分
+    EXCEPTION
+        --# その他例外の処理
+        WHEN OTHERS THEN
+            N_RET := C_RET_NG;                --戻り値を異常終了に設定すること
+            ----DBMS_OUTPUT.PUT_LINE(SQLCODE);    --メッセージコード出力
+            ----DBMS_OUTPUT.PUT_LINE(SQLERRM);    --メッセージ出力
+            --RAISE EX_CHANE_TYPE_OHRS;
+            RAISE EXCEPTION '操作区分 --> %', T001_TABLE.CHANE_TYPE USING HINT = '異常値です。';
+    END;
+    
+    --■業務別顧客IDにより、古い顧客情報を取得すること
+--    BEGIN
+--        SELECT *
+--          INTO OLD_BIZ_CUST
+--          FROM T001_BIZ_CUST T001
+--         WHERE T001.BIZ_CUST_ID = T001_TABLE.BIZ_CUST_ID;
+--    EXCEPTION
+--        --# その他例外の処理
+--        WHEN OTHERS THEN
+--            N_RET := C_RET_NG;                --戻り値を異常終了に設定すること
+--            --DBMS_OUTPUT.PUT_LINE(SQLCODE);    --メッセージコード出力
+--            --DBMS_OUTPUT.PUT_LINE(SQLERRM);    --メッセージ出力
+--            --RAISE EX_SELECT_T001_OHRS;
+--            RAISE EXCEPTION '事業部コード --> %', T001_TABLE.BIZ_CUST_ID USING HINT = '異常値です。';
+--    END;
+    
+    --■データのチェック
+    BEGIN
+        IF V_CHANE_TYPE IN (C_TYT001_TABLE.DELETE, C_TYT001_TABLE.UPDATE) AND 
+           OLD_BIZ_CUST.BIZ_CUST_ID != T001_TABLE.BIZ_CUST_ID AND 
+           OLD_BIZ_CUST.CUST_ID != T001_TABLE.CUST_ID THEN
+            N_RET := C_RET_NG;                                      --戻り値を異常終了に設定すること
+            --DBMS_OUTPUT.PUT_LINE('業務別顧客ID:' || T001_TABLE.BIZ_CUST_ID );--業務別顧客ID
+            --DBMS_OUTPUT.PUT_LINE('顧客ID:'  || T001_TABLE.CUST_ID );         --顧客ID
+            --RAISE EX_CHK_CUST_ID;
+            RAISE EXCEPTION '事業部コード --> %',T001_TABLE.BIZ_CUST_ID USING HINT = '異常値です。';
+        END IF;
+    EXCEPTION
+        --# その他例外の処理
+        WHEN OTHERS THEN
+            N_RET := C_RET_NG;                --戻り値を異常終了に設定すること
+            --DBMS_OUTPUT.PUT_LINE(SQLCODE);    --メッセージコード出力
+            --DBMS_OUTPUT.PUT_LINE(SQLERRM);    --メッセージ出力
+            --RAISE EX_CHK_CUST_ID_OHRS;
+            RAISE EXCEPTION '事業部コード --> %', T001_TABLE.BIZ_CUST_ID USING HINT = '異常値です。';
+    END;
+    
+    --■シーケンス(業務別顧客ID)の取得
+    BEGIN
+        IF V_CHANE_TYPE = C_TYT001_TABLE.INSERT THEN
+            SELECT NEXVAL('SEQ_T001_BIZ_CUST_ID')
+              INTO N_BIZ_CUST_ID              --業務別顧客ID
+              ;
+        END IF;
+    EXCEPTION
+        --# その他例外の処理
+        WHEN OTHERS THEN
+            N_RET := C_RET_NG;                --戻り値を異常終了に設定すること
+            --DBMS_OUTPUT.PUT_LINE(SQLCODE);    --メッセージコード出力
+            --DBMS_OUTPUT.PUT_LINE(SQLERRM);    --メッセージ出力
+            --RAISE EX_T001_SEQ_NXT_OHRS;
+            RAISE EXCEPTION '事業部コード --> %', T001_TABLE.BIZ_CUST_ID USING HINT = '異常値です。';
+    END;
+    
+    --■新しい顧客情報を設定すること
+    BEGIN
+
+    --■パッケージで処理
+    BEGIN
+        USER_CALL_STAT(V_CHANE_TYPE
+        , T001_TABLE
+        --, OLD_BIZ_CUST
+        );
+    EXCEPTION
+        --# その他例外の処理
+        WHEN OTHERS THEN
+            N_RET := C_RET_NG;                --戻り値を異常終了に設定すること
+            --DBMS_OUTPUT.PUT_LINE(SQLCODE);    --メッセージコード出力
+            --DBMS_OUTPUT.PUT_LINE(SQLERRM);    --メッセージ出力
+            --RAISE EX_BEFORE_PROC_OHRS;
+            --RAISE_APPLICATION_ERROR(-20008, C_BEFORE_PROC_OHRS_MSG || '   OraErrMsg:' || SQLCODE|| ':' || SQLERRM );--例外の呼び出す
+    END;
+    
+    --■顧客情報の操作処理
+    CASE P_CHANE_TYPE
+    --# 顧客情報の登録処理
+    WHEN C_TYT001_TABLE.INSERT THEN
+        BEGIN
+            INSERT INTO T001_BIZ_CUST(
+                BIZ_CUST_ID,             --業務別顧客ID
+                INS_USER_ID,             --登録ユーザーID
+                INS_DT,                  --登録日時
+                UPD_USER_ID,             --修正ユーザーID
+                UPD_DT,                  --修正日時
+                BIZ_ID,                  --事業ID
+                CUST_ID,                 --顧客ID
+                ADDR_ID,                 --住所ID
+                ADDR_PREF_CD,            --住所コード（都道府県）
+                ADDR_CITY_CD,            --住所コード（群市区）
+                ADDR_ZONE_CD,            --住所コード（町村）
+                CONTACT_TEL_NO,          --連絡先電話番号
+                FIND_TEL_NO,             --検索電話番号
+                CALL_RST_ID,             --最新コール結果
+                CALL_RST_RANK_CD,        --最新ランク区分
+                CALL_DT,                 --最新コール日時
+                APO_DT,                  --客先指定日時
+                CALL_USER_ID,            --営業員ID
+                CALL_USER_NM,            --営業員氏名
+                GRT001_TABLE.ID,         --グループ
+                SUB_GRT001_TABLE.ID,     --サブグループID
+                LIST_ID,                 --リストID
+                LIST_TYPE_ID,            --リストタイプID
+                LIST_SEQNO,              --リスト内シーケンス番号
+                LOCKING_USER_ID,         --使用中ユーザーID
+                LOCKING_TS,              --使用開始タイムスタンプ
+                EDIT_FLG,                --表示フラグ
+                EDIT_RULE,               --編集ルール
+                EDIT_REMARKS,            --編集備考
+                INDST_BASE_ID,           --大業種ID
+                INDST_DETAIL_ID,         --業種詳細情報ID
+                CORT001_TABLE.CODE,      --法人格コード
+                APO_CALL_USER_ID,        --アポ成立担当ユーザーID
+                VISITED_CALL_USER_ID,    --訪問担当ユーザーID
+                RESV1,                   --カスタマイズ項目1
+                RESV2,                   --カスタマイズ項目2
+                RESV3,                   --カスタマイズ項目3
+                RESV4,                   --カスタマイズ項目4
+                RESV5,                   --カスタマイズ項目5
+                RESV6,                   --カスタマイズ項目6
+                RESV7,                   --カスタマイズ項目7
+                RESV8,                   --カスタマイズ項目8
+                RESV9,                   --カスタマイズ項目9
+                RESV10,                  --カスタマイズ項目10
+                RESV11,                  --カスタマイズ項目11
+                RESV12,                  --カスタマイズ項目12
+                RESV13,                  --カスタマイズ項目13
+                RESV14,                  --カスタマイズ項目14
+                RESV15,                  --カスタマイズ項目15
+                RESV16,                  --カスタマイズ項目16
+                RESV17,                  --カスタマイズ項目17
+                RESV18,                  --カスタマイズ項目18
+                RESV19,                  --カスタマイズ項目19
+                RESV20,                  --カスタマイズ項目20
+                RESV21,                  --カスタマイズ項目21
+                RESV22,                  --カスタマイズ項目22
+                RESV23,                  --カスタマイズ項目23
+                RESV24,                  --カスタマイズ項目24
+                RESV25,                  --カスタマイズ項目25
+                RESV26,                  --カスタマイズ項目26
+                RESV27,                  --カスタマイズ項目27
+                RESV28,                  --カスタマイズ項目28
+                RESV29,                  --カスタマイズ項目29
+                RESV30,                  --カスタマイズ項目30
+                RESV31,                  --カスタマイズ項目31
+                RESV32,                  --カスタマイズ項目32
+                RESV33,                  --カスタマイズ項目33
+                RESV34,                  --カスタマイズ項目34
+                RESV35,                  --カスタマイズ項目35
+                RESV36,                  --カスタマイズ項目36
+                RESV37,                  --カスタマイズ項目37
+                RESV38,                  --カスタマイズ項目38
+                RESV39,                  --カスタマイズ項目39
+                RESV40,                  --カスタマイズ項目40
+                RESV41,                  --カスタマイズ項目41
+                RESV42,                  --カスタマイズ項目42
+                RESV43,                  --カスタマイズ項目43
+                RESV44,                  --カスタマイズ項目44
+                RESV45,                  --カスタマイズ項目45
+                RESV46,                  --カスタマイズ項目46
+                RESV47,                  --カスタマイズ項目47
+                RESV48,                  --カスタマイズ項目48
+                RESV49,                  --カスタマイズ項目49
+                RESV50,                  --カスタマイズ項目50
+                RESV51,                  --カスタマイズ項目51
+                RESV52,                  --カスタマイズ項目52
+                RESV53,                  --カスタマイズ項目53
+                RESV54,                  --カスタマイズ項目54
+                RESV55,                  --カスタマイズ項目55
+                RESV56,                  --カスタマイズ項目56
+                RESV57,                  --カスタマイズ項目57
+                RESV58,                  --カスタマイズ項目58
+                RESV59,                  --カスタマイズ項目59
+                RESV60,                  --カスタマイズ項目60
+                RESV61,                  --カスタマイズ項目61
+                RESV62,                  --カスタマイズ項目62
+                RESV63,                  --カスタマイズ項目63
+                RESV64,                  --カスタマイズ項目64
+                RESV65,                  --カスタマイズ項目65
+                RESV66,                  --カスタマイズ項目66
+                RESV67,                  --カスタマイズ項目67
+                RESV68,                  --カスタマイズ項目68
+                RESV69,                  --カスタマイズ項目69
+                RESV70,                  --カスタマイズ項目70
+                RESV71,                  --カスタマイズ項目71
+                RESV72,                  --カスタマイズ項目72
+                RESV73,                  --カスタマイズ項目73
+                RESV74,                  --カスタマイズ項目74
+                RESV75,                  --カスタマイズ項目75
+                RESV76,                  --カスタマイズ項目76
+                RESV77,                  --カスタマイズ項目77
+                RESV78,                  --カスタマイズ項目78
+                RESV79,                  --カスタマイズ項目79
+                RESV80,                  --カスタマイズ項目80
+                RESV81,                  --カスタマイズ項目81
+                RESV82,                  --カスタマイズ項目82
+                RESV83,                  --カスタマイズ項目83
+                RESV84,                  --カスタマイズ項目84
+                RESV85,                  --カスタマイズ項目85
+                RESV86,                  --カスタマイズ項目86
+                RESV87,                  --カスタマイズ項目87
+                RESV88,                  --カスタマイズ項目88
+                RESV89,                  --カスタマイズ項目89
+                RESV90,                  --カスタマイズ項目90
+                RESV91,                  --カスタマイズ項目91
+                RESV92,                  --カスタマイズ項目92
+                RESV93,                  --カスタマイズ項目93
+                RESV94,                  --カスタマイズ項目94
+                RESV95,                  --カスタマイズ項目95
+                RESV96,                  --カスタマイズ項目96
+                RESV97,                  --カスタマイズ項目97
+                RESV98,                  --カスタマイズ項目98
+                RESV99,                  --カスタマイズ項目99
+                RESV100,                 --カスタマイズ項目100
+                RESV101,                 --カスタマイズ項目101
+                RESV102,                 --カスタマイズ項目102
+                RESV103,                 --カスタマイズ項目103
+                RESV104,                 --カスタマイズ項目104
+                RESV105,                 --カスタマイズ項目105
+                RESV106,                 --カスタマイズ項目106
+                RESV107,                 --カスタマイズ項目107
+                RESV108,                 --カスタマイズ項目108
+                RESV109,                 --カスタマイズ項目109
+                RESV110,                 --カスタマイズ項目110
+                RESV111,                 --カスタマイズ項目111
+                RESV112,                 --カスタマイズ項目112
+                RESV113,                 --カスタマイズ項目113
+                RESV114,                 --カスタマイズ項目114
+                RESV115,                 --カスタマイズ項目115
+                RESV116,                 --カスタマイズ項目116
+                RESV117,                 --カスタマイズ項目117
+                RESV118,                 --カスタマイズ項目118
+                RESV119,                 --カスタマイズ項目119
+                RESV120,                 --カスタマイズ項目120
+                RESV121,                 --カスタマイズ項目121
+                RESV122,                 --カスタマイズ項目122
+                RESV123,                 --カスタマイズ項目123
+                RESV124,                 --カスタマイズ項目124
+                RESV125,                 --カスタマイズ項目125
+                RESV126,                 --カスタマイズ項目126
+                RESV127,                 --カスタマイズ項目127
+                RESV128,                 --カスタマイズ項目128
+                RESV129,                 --カスタマイズ項目129
+                RESV130,                 --カスタマイズ項目130
+                RESV131,                 --カスタマイズ項目131
+                RESV132,                 --カスタマイズ項目132
+                RESV133,                 --カスタマイズ項目133
+                RESV134,                 --カスタマイズ項目134
+                RESV135,                 --カスタマイズ項目135
+                RESV136,                 --カスタマイズ項目136
+                RESV137,                 --カスタマイズ項目137
+                RESV138,                 --カスタマイズ項目138
+                RESV139,                 --カスタマイズ項目139
+                RESV140,                 --カスタマイズ項目140
+                RESV141,                 --カスタマイズ項目141
+                RESV142,                 --カスタマイズ項目142
+                RESV143,                 --カスタマイズ項目143
+                RESV144,                 --カスタマイズ項目144
+                RESV145,                 --カスタマイズ項目145
+                RESV146,                 --カスタマイズ項目146
+                RESV147,                 --カスタマイズ項目147
+                RESV148,                 --カスタマイズ項目148
+                RESV149,                 --カスタマイズ項目149
+                RESV150,                 --カスタマイズ項目150
+                RESV151,                 --カスタマイズ項目151
+                RESV152,                 --カスタマイズ項目152
+                RESV153,                 --カスタマイズ項目153
+                RESV154,                 --カスタマイズ項目154
+                RESV155,                 --カスタマイズ項目155
+                RESV156,                 --カスタマイズ項目156
+                RESV157,                 --カスタマイズ項目157
+                RESV158,                 --カスタマイズ項目158
+                RESV159,                 --カスタマイズ項目159
+                RESV160,                 --カスタマイズ項目160
+                RESV161,                 --カスタマイズ項目151
+                RESV162,                 --カスタマイズ項目152
+                RESV163,                 --カスタマイズ項目153
+                RESV164,                 --カスタマイズ項目154
+                RESV165,                 --カスタマイズ項目155
+                RESV166,                 --カスタマイズ項目156
+                RESV167,                 --カスタマイズ項目157
+                RESV168,                 --カスタマイズ項目158
+                RESV169,                 --カスタマイズ項目159
+                RESV170,                 --カスタマイズ項目160
+                RESV171,                 --カスタマイズ項目151
+                RESV172,                 --カスタマイズ項目152
+                RESV173,                 --カスタマイズ項目153
+                RESV174,                 --カスタマイズ項目154
+                RESV175,                 --カスタマイズ項目155
+                RESV176,                 --カスタマイズ項目156
+                RESV177,                 --カスタマイズ項目157
+                RESV178,                 --カスタマイズ項目158
+                RESV179,                 --カスタマイズ項目159
+                RESV180,                 --カスタマイズ項目160
+                RESV181,                 --カスタマイズ項目151
+                RESV182,                 --カスタマイズ項目152
+                RESV183,                 --カスタマイズ項目153
+                RESV184,                 --カスタマイズ項目154
+                RESV185,                 --カスタマイズ項目155
+                RESV186,                 --カスタマイズ項目156
+                RESV187,                 --カスタマイズ項目157
+                RESV188,                 --カスタマイズ項目158
+                RESV189,                 --カスタマイズ項目159
+                RESV190,                 --カスタマイズ項目160
+                RESV191,                 --カスタマイズ項目151
+                RESV192,                 --カスタマイズ項目152
+                RESV193,                 --カスタマイズ項目153
+                RESV194,                 --カスタマイズ項目154
+                RESV195,                 --カスタマイズ項目155
+                RESV196,                 --カスタマイズ項目156
+                RESV197,                 --カスタマイズ項目157
+                RESV198,                 --カスタマイズ項目158
+                RESV199,                 --カスタマイズ項目159
+                RESV200,                 --カスタマイズ項目160
+                RESV201,                 --カスタマイズ項目201
+                RESV202,                 --カスタマイズ項目202
+                RESV203,                 --カスタマイズ項目203
+                RESV204,                 --カスタマイズ項目204
+                RESV205,                 --カスタマイズ項目205
+                RESV206,                 --カスタマイズ項目206
+                RESV207,                 --カスタマイズ項目207
+                RESV208,                 --カスタマイズ項目208
+                RESV209,                 --カスタマイズ項目209
+                RESV210,                 --カスタマイズ項目210
+                RESV211,                 --カスタマイズ項目211
+                RESV212,                 --カスタマイズ項目212
+                RESV213,                 --カスタマイズ項目213
+                RESV214,                 --カスタマイズ項目214
+                RESV215,                 --カスタマイズ項目215
+                RESV216,                 --カスタマイズ項目216
+                RESV217,                 --カスタマイズ項目217
+                RESV218,                 --カスタマイズ項目218
+                RESV219,                 --カスタマイズ項目219
+                RESV220,                 --カスタマイズ項目220
+                RESV221,                 --カスタマイズ項目221
+                RESV222,                 --カスタマイズ項目222
+                RESV223,                 --カスタマイズ項目223
+                RESV224,                 --カスタマイズ項目224
+                RESV225,                 --カスタマイズ項目225
+                RESV226,                 --カスタマイズ項目226
+                RESV227,                 --カスタマイズ項目227
+                RESV228,                 --カスタマイズ項目228
+                RESV229,                 --カスタマイズ項目229
+                RESV230,                 --カスタマイズ項目230
+                RESV231,                 --カスタマイズ項目231
+                RESV232,                 --カスタマイズ項目232
+                RESV233,                 --カスタマイズ項目233
+                RESV234,                 --カスタマイズ項目234
+                RESV235,                 --カスタマイズ項目235
+                RESV236,                 --カスタマイズ項目236
+                RESV237,                 --カスタマイズ項目237
+                RESV238,                 --カスタマイズ項目238
+                RESV239,                 --カスタマイズ項目239
+                RESV240,                 --カスタマイズ項目240
+                RESV241,                 --カスタマイズ項目241
+                RESV242,                 --カスタマイズ項目242
+                RESV243,                 --カスタマイズ項目243
+                RESV244,                 --カスタマイズ項目244
+                RESV245,                 --カスタマイズ項目245
+                RESV246,                 --カスタマイズ項目246
+                RESV247,                 --カスタマイズ項目247
+                RESV248,                 --カスタマイズ項目248
+                RESV249,                 --カスタマイズ項目249
+                RESV250,                 --カスタマイズ項目250
+                RESV251,                 --カスタマイズ項目251
+                RESV252,                 --カスタマイズ項目252
+                RESV253,                 --カスタマイズ項目253
+                RESV254,                 --カスタマイズ項目254
+                RESV255,                 --カスタマイズ項目255
+                RESV256,                 --カスタマイズ項目256
+                RESV257,                 --カスタマイズ項目257
+                RESV258,                 --カスタマイズ項目258
+                RESV259,                 --カスタマイズ項目259
+                RESV260,                 --カスタマイズ項目260
+                RESV261,                 --カスタマイズ項目261
+                RESV262,                 --カスタマイズ項目262
+                RESV263,                 --カスタマイズ項目263
+                RESV264,                 --カスタマイズ項目264
+                RESV265,                 --カスタマイズ項目265
+                RESV266,                 --カスタマイズ項目266
+                RESV267,                 --カスタマイズ項目267
+                RESV268,                 --カスタマイズ項目268
+                RESV269,                 --カスタマイズ項目269
+                RESV270,                 --カスタマイズ項目270
+                RESV271,                 --カスタマイズ項目271
+                RESV272,                 --カスタマイズ項目272
+                RESV273,                 --カスタマイズ項目273
+                RESV274,                 --カスタマイズ項目274
+                RESV275,                 --カスタマイズ項目275
+                RESV276,                 --カスタマイズ項目276
+                RESV277,                 --カスタマイズ項目277
+                RESV278,                 --カスタマイズ項目278
+                RESV279,                 --カスタマイズ項目279
+                RESV280,                 --カスタマイズ項目280
+                RESV281,                 --カスタマイズ項目281
+                RESV282,                 --カスタマイズ項目282
+                RESV283,                 --カスタマイズ項目283
+                RESV284,                 --カスタマイズ項目284
+                RESV285,                 --カスタマイズ項目285
+                RESV286,                 --カスタマイズ項目286
+                RESV287,                 --カスタマイズ項目287
+                RESV288,                 --カスタマイズ項目288
+                RESV289,                 --カスタマイズ項目289
+                RESV290,                 --カスタマイズ項目290
+                RESV291,                 --カスタマイズ項目291
+                RESV292,                 --カスタマイズ項目292
+                RESV293,                 --カスタマイズ項目293
+                RESV294,                 --カスタマイズ項目294
+                RESV295,                 --カスタマイズ項目295
+                RESV296,                 --カスタマイズ項目296
+                RESV297,                 --カスタマイズ項目297
+                RESV298,                 --カスタマイズ項目298
+                RESV299,                 --カスタマイズ項目299
+                RESV300,                 --カスタマイズ項目300
+                RESV301,                 --カスタマイズ項目301
+                RESV302,                 --カスタマイズ項目302
+                RESV303,                 --カスタマイズ項目303
+                RESV304,                 --カスタマイズ項目304
+                RESV305,                 --カスタマイズ項目305
+                RESV306,                 --カスタマイズ項目306
+                RESV307,                 --カスタマイズ項目307
+                RESV308,                 --カスタマイズ項目308
+                RESV309,                 --カスタマイズ項目309
+                RESV310,                 --カスタマイズ項目310
+                RESV311,                 --カスタマイズ項目311
+                RESV312,                 --カスタマイズ項目312
+                RESV313,                 --カスタマイズ項目313
+                RESV314,                 --カスタマイズ項目314
+                RESV315,                 --カスタマイズ項目315
+                RESV316,                 --カスタマイズ項目316
+                RESV317,                 --カスタマイズ項目317
+                RESV318,                 --カスタマイズ項目318
+                RESV319,                 --カスタマイズ項目319
+                RESV320,                 --カスタマイズ項目320
+                RESV321,                 --カスタマイズ項目321
+                RESV322,                 --カスタマイズ項目322
+                RESV323,                 --カスタマイズ項目323
+                RESV324,                 --カスタマイズ項目324
+                RESV325,                 --カスタマイズ項目325
+                RESV326,                 --カスタマイズ項目326
+                RESV327,                 --カスタマイズ項目327
+                RESV328,                 --カスタマイズ項目328
+                RESV329,                 --カスタマイズ項目329
+                RESV330,                 --カスタマイズ項目330
+                RESV331,                 --カスタマイズ項目331
+                RESV332,                 --カスタマイズ項目332
+                RESV333,                 --カスタマイズ項目333
+                RESV334,                 --カスタマイズ項目334
+                RESV335,                 --カスタマイズ項目335
+                RESV336,                 --カスタマイズ項目336
+                RESV337,                 --カスタマイズ項目337
+                RESV338,                 --カスタマイズ項目338
+                RESV339,                 --カスタマイズ項目339
+                RESV340,                 --カスタマイズ項目340
+                RESV341,                 --カスタマイズ項目341
+                RESV342,                 --カスタマイズ項目342
+                RESV343,                 --カスタマイズ項目343
+                RESV344,                 --カスタマイズ項目344
+                RESV345,                 --カスタマイズ項目345
+                RESV346,                 --カスタマイズ項目346
+                RESV347,                 --カスタマイズ項目347
+                RESV348,                 --カスタマイズ項目348
+                RESV349,                 --カスタマイズ項目349
+                RESV350,                 --カスタマイズ項目350
+                RESV351,                 --カスタマイズ項目351
+                RESV352,                 --カスタマイズ項目352
+                RESV353,                 --カスタマイズ項目353
+                RESV354,                 --カスタマイズ項目354
+                RESV355,                 --カスタマイズ項目355
+                RESV356,                 --カスタマイズ項目356
+                RESV357,                 --カスタマイズ項目357
+                RESV358,                 --カスタマイズ項目358
+                RESV359,                 --カスタマイズ項目359
+                RESV360,                 --カスタマイズ項目360
+                RESV361,                 --カスタマイズ項目361
+                RESV362,                 --カスタマイズ項目362
+                RESV363,                 --カスタマイズ項目363
+                RESV364,                 --カスタマイズ項目364
+                RESV365,                 --カスタマイズ項目365
+                RESV366,                 --カスタマイズ項目366
+                RESV367,                 --カスタマイズ項目367
+                RESV368,                 --カスタマイズ項目368
+                RESV369,                 --カスタマイズ項目369
+                RESV370,                 --カスタマイズ項目370
+                RESV371,                 --カスタマイズ項目371
+                RESV372,                 --カスタマイズ項目372
+                RESV373,                 --カスタマイズ項目373
+                RESV374,                 --カスタマイズ項目374
+                RESV375,                 --カスタマイズ項目375
+                RESV376,                 --カスタマイズ項目376
+                RESV377,                 --カスタマイズ項目377
+                RESV378,                 --カスタマイズ項目378
+                RESV379,                 --カスタマイズ項目379
+                RESV380,                 --カスタマイズ項目380
+                RESV381,                 --カスタマイズ項目381
+                RESV382,                 --カスタマイズ項目382
+                RESV383,                 --カスタマイズ項目383
+                RESV384,                 --カスタマイズ項目384
+                RESV385,                 --カスタマイズ項目385
+                RESV386,                 --カスタマイズ項目386
+                RESV387,                 --カスタマイズ項目387
+                RESV388,                 --カスタマイズ項目388
+                RESV389,                 --カスタマイズ項目389
+                RESV390,                 --カスタマイズ項目390
+                RESV391,                 --カスタマイズ項目391
+                RESV392,                 --カスタマイズ項目392
+                RESV393,                 --カスタマイズ項目393
+                RESV394,                 --カスタマイズ項目394
+                RESV395,                 --カスタマイズ項目395
+                RESV396,                 --カスタマイズ項目396
+                RESV397,                 --カスタマイズ項目397
+                RESV398,                 --カスタマイズ項目398
+                RESV399,                 --カスタマイズ項目399
+                RESV400          --カスタマイズ項目400
+            )VALUES (
+                T001_TABLE.BIZ_CUST_ID,             --業務別顧客ID
+                T001_TABLE.INS_USER_ID,             --登録ユーザーID
+                T001_TABLE.INS_DT,                  --登録日時
+                T001_TABLE.UPD_USER_ID,             --修正ユーザーID
+                T001_TABLE.UPD_DT,                  --修正日時
+                T001_TABLE.BIZ_ID,                  --事業ID
+                T001_TABLE.CUST_ID,                 --顧客ID
+                T001_TABLE.ADDR_ID,                 --住所ID
+                T001_TABLE.ADDR_PREF_CD,            --住所コード（都道府県）
+                T001_TABLE.ADDR_CITY_CD,            --住所コード（群市区）
+                T001_TABLE.ADDR_ZONE_CD,            --住所コード（町村）
+                T001_TABLE.CONTACT_TEL_NO,          --連絡先電話番号
+                T001_TABLE.FIND_TEL_NO,             --検索電話番号
+                T001_TABLE.CALL_RST_ID,             --最新コール結果
+                T001_TABLE.CALL_RST_RANK_CD,        --最新ランク区分
+                T001_TABLE.CALL_DT,                 --最新コール日時
+                T001_TABLE.APO_DT,                  --客先指定日時
+                T001_TABLE.CALL_USER_ID,            --営業員ID
+                T001_TABLE.CALL_USER_NM,            --営業員氏名
+                T001_TABLE.GRT001_TABLE.ID,                  --グループ
+                T001_TABLE.SUB_GRT001_TABLE.ID,              --サブグループID
+                T001_TABLE.LIST_ID,                 --リストID
+                T001_TABLE.LIST_TYPE_ID,            --リストタイプID
+                T001_TABLE.LIST_SEQNO,              --リスト内シーケンス番号
+                T001_TABLE.LOCKING_USER_ID,         --使用中ユーザーID
+                T001_TABLE.LOCKING_TS,              --使用開始タイムスタンプ
+                T001_TABLE.EDIT_FLG,                --表示フラグ
+                T001_TABLE.EDIT_RULE,               --編集ルール
+                T001_TABLE.EDIT_REMARKS,            --編集備考
+                T001_TABLE.INDST_BASE_ID,           --大業種ID
+                T001_TABLE.INDST_DETAIL_ID,         --業種詳細情報ID
+                T001_TABLE.CORT001_TABLE.CODE,               --法人格コード
+                T001_TABLE.APO_CALL_USER_ID,        --アポ成立担当ユーザーID
+                T001_TABLE.VISITED_CALL_USER_ID,    --訪問担当ユーザーID
+                T001_TABLE.RESV1,                   --カスタマイズ項目1
+                T001_TABLE.RESV2,                   --カスタマイズ項目2
+                T001_TABLE.RESV3,                   --カスタマイズ項目3
+                T001_TABLE.RESV4,                   --カスタマイズ項目4
+                T001_TABLE.RESV5,                   --カスタマイズ項目5
+                T001_TABLE.RESV6,                   --カスタマイズ項目6
+                T001_TABLE.RESV7,                   --カスタマイズ項目7
+                T001_TABLE.RESV8,                   --カスタマイズ項目8
+                T001_TABLE.RESV9,                   --カスタマイズ項目9
+                T001_TABLE.RESV10,                  --カスタマイズ項目10
+                T001_TABLE.RESV11,                  --カスタマイズ項目11
+                T001_TABLE.RESV12,                  --カスタマイズ項目12
+                T001_TABLE.RESV13,                  --カスタマイズ項目13
+                T001_TABLE.RESV14,                  --カスタマイズ項目14
+                T001_TABLE.RESV15,                  --カスタマイズ項目15
+                T001_TABLE.RESV16,                  --カスタマイズ項目16
+                T001_TABLE.RESV17,                  --カスタマイズ項目17
+                T001_TABLE.RESV18,                  --カスタマイズ項目18
+                T001_TABLE.RESV19,                  --カスタマイズ項目19
+                T001_TABLE.RESV20,                  --カスタマイズ項目20
+                T001_TABLE.RESV21,                  --カスタマイズ項目21
+                T001_TABLE.RESV22,                  --カスタマイズ項目22
+                T001_TABLE.RESV23,                  --カスタマイズ項目23
+                T001_TABLE.RESV24,                  --カスタマイズ項目24
+                T001_TABLE.RESV25,                  --カスタマイズ項目25
+                T001_TABLE.RESV26,                  --カスタマイズ項目26
+                T001_TABLE.RESV27,                  --カスタマイズ項目27
+                T001_TABLE.RESV28,                  --カスタマイズ項目28
+                T001_TABLE.RESV29,                  --カスタマイズ項目29
+                T001_TABLE.RESV30,                  --カスタマイズ項目30
+                T001_TABLE.RESV31,                  --カスタマイズ項目31
+                T001_TABLE.RESV32,                  --カスタマイズ項目32
+                T001_TABLE.RESV33,                  --カスタマイズ項目33
+                T001_TABLE.RESV34,                  --カスタマイズ項目34
+                T001_TABLE.RESV35,                  --カスタマイズ項目35
+                T001_TABLE.RESV36,                  --カスタマイズ項目36
+                T001_TABLE.RESV37,                  --カスタマイズ項目37
+                T001_TABLE.RESV38,                  --カスタマイズ項目38
+                T001_TABLE.RESV39,                  --カスタマイズ項目39
+                T001_TABLE.RESV40,                  --カスタマイズ項目40
+                T001_TABLE.RESV41,                  --カスタマイズ項目41
+                T001_TABLE.RESV42,                  --カスタマイズ項目42
+                T001_TABLE.RESV43,                  --カスタマイズ項目43
+                T001_TABLE.RESV44,                  --カスタマイズ項目44
+                T001_TABLE.RESV45,                  --カスタマイズ項目45
+                T001_TABLE.RESV46,                  --カスタマイズ項目46
+                T001_TABLE.RESV47,                  --カスタマイズ項目47
+                T001_TABLE.RESV48,                  --カスタマイズ項目48
+                T001_TABLE.RESV49,                  --カスタマイズ項目49
+                T001_TABLE.RESV50,                  --カスタマイズ項目50
+                T001_TABLE.RESV51,                  --カスタマイズ項目51
+                T001_TABLE.RESV52,                  --カスタマイズ項目52
+                T001_TABLE.RESV53,                  --カスタマイズ項目53
+                T001_TABLE.RESV54,                  --カスタマイズ項目54
+                T001_TABLE.RESV55,                  --カスタマイズ項目55
+                T001_TABLE.RESV56,                  --カスタマイズ項目56
+                T001_TABLE.RESV57,                  --カスタマイズ項目57
+                T001_TABLE.RESV58,                  --カスタマイズ項目58
+                T001_TABLE.RESV59,                  --カスタマイズ項目59
+                T001_TABLE.RESV60,                  --カスタマイズ項目60
+                T001_TABLE.RESV61,                  --カスタマイズ項目61
+                T001_TABLE.RESV62,                  --カスタマイズ項目62
+                T001_TABLE.RESV63,                  --カスタマイズ項目63
+                T001_TABLE.RESV64,                  --カスタマイズ項目64
+                T001_TABLE.RESV65,                  --カスタマイズ項目65
+                T001_TABLE.RESV66,                  --カスタマイズ項目66
+                T001_TABLE.RESV67,                  --カスタマイズ項目67
+                T001_TABLE.RESV68,                  --カスタマイズ項目68
+                T001_TABLE.RESV69,                  --カスタマイズ項目69
+                T001_TABLE.RESV70,                  --カスタマイズ項目70
+                T001_TABLE.RESV71,                  --カスタマイズ項目71
+                T001_TABLE.RESV72,                  --カスタマイズ項目72
+                T001_TABLE.RESV73,                  --カスタマイズ項目73
+                T001_TABLE.RESV74,                  --カスタマイズ項目74
+                T001_TABLE.RESV75,                  --カスタマイズ項目75
+                T001_TABLE.RESV76,                  --カスタマイズ項目76
+                T001_TABLE.RESV77,                  --カスタマイズ項目77
+                T001_TABLE.RESV78,                  --カスタマイズ項目78
+                T001_TABLE.RESV79,                  --カスタマイズ項目79
+                T001_TABLE.RESV80,                  --カスタマイズ項目80
+                T001_TABLE.RESV81,                  --カスタマイズ項目81
+                T001_TABLE.RESV82,                  --カスタマイズ項目82
+                T001_TABLE.RESV83,                  --カスタマイズ項目83
+                T001_TABLE.RESV84,                  --カスタマイズ項目84
+                T001_TABLE.RESV85,                  --カスタマイズ項目85
+                T001_TABLE.RESV86,                  --カスタマイズ項目86
+                T001_TABLE.RESV87,                  --カスタマイズ項目87
+                T001_TABLE.RESV88,                  --カスタマイズ項目88
+                T001_TABLE.RESV89,                  --カスタマイズ項目89
+                T001_TABLE.RESV90,                  --カスタマイズ項目90
+                T001_TABLE.RESV91,                  --カスタマイズ項目91
+                T001_TABLE.RESV92,                  --カスタマイズ項目92
+                T001_TABLE.RESV93,                  --カスタマイズ項目93
+                T001_TABLE.RESV94,                  --カスタマイズ項目94
+                T001_TABLE.RESV95,                  --カスタマイズ項目95
+                T001_TABLE.RESV96,                  --カスタマイズ項目96
+                T001_TABLE.RESV97,                  --カスタマイズ項目97
+                T001_TABLE.RESV98,                  --カスタマイズ項目98
+                T001_TABLE.RESV99,                  --カスタマイズ項目99
+                T001_TABLE.RESV100,                 --カスタマイズ項目100
+                T001_TABLE.RESV101,                 --カスタマイズ項目101
+                T001_TABLE.RESV102,                 --カスタマイズ項目102
+                T001_TABLE.RESV103,                 --カスタマイズ項目103
+                T001_TABLE.RESV104,                 --カスタマイズ項目104
+                T001_TABLE.RESV105,                 --カスタマイズ項目105
+                T001_TABLE.RESV106,                 --カスタマイズ項目106
+                T001_TABLE.RESV107,                 --カスタマイズ項目107
+                T001_TABLE.RESV108,                 --カスタマイズ項目108
+                T001_TABLE.RESV109,                 --カスタマイズ項目109
+                T001_TABLE.RESV110,                 --カスタマイズ項目110
+                T001_TABLE.RESV111,                 --カスタマイズ項目111
+                T001_TABLE.RESV112,                 --カスタマイズ項目112
+                T001_TABLE.RESV113,                 --カスタマイズ項目113
+                T001_TABLE.RESV114,                 --カスタマイズ項目114
+                T001_TABLE.RESV115,                 --カスタマイズ項目115
+                T001_TABLE.RESV116,                 --カスタマイズ項目116
+                T001_TABLE.RESV117,                 --カスタマイズ項目117
+                T001_TABLE.RESV118,                 --カスタマイズ項目118
+                T001_TABLE.RESV119,                 --カスタマイズ項目119
+                T001_TABLE.RESV120,                  --カスタマイズ項目120
+                T001_TABLE.RESV121,                 --カスタマイズ項目121
+                T001_TABLE.RESV122,                 --カスタマイズ項目122
+                T001_TABLE.RESV123,                 --カスタマイズ項目123
+                T001_TABLE.RESV124,                 --カスタマイズ項目124
+                T001_TABLE.RESV125,                 --カスタマイズ項目125
+                T001_TABLE.RESV126,                 --カスタマイズ項目126
+                T001_TABLE.RESV127,                 --カスタマイズ項目127
+                T001_TABLE.RESV128,                 --カスタマイズ項目128
+                T001_TABLE.RESV129,                 --カスタマイズ項目129
+                T001_TABLE.RESV130,                 --カスタマイズ項目130
+                T001_TABLE.RESV131,                 --カスタマイズ項目131
+                T001_TABLE.RESV132,                 --カスタマイズ項目132
+                T001_TABLE.RESV133,                 --カスタマイズ項目133
+                T001_TABLE.RESV134,                 --カスタマイズ項目134
+                T001_TABLE.RESV135,                 --カスタマイズ項目135
+                T001_TABLE.RESV136,                 --カスタマイズ項目136
+                T001_TABLE.RESV137,                 --カスタマイズ項目137
+                T001_TABLE.RESV138,                 --カスタマイズ項目138
+                T001_TABLE.RESV139,                 --カスタマイズ項目139
+                T001_TABLE.RESV140,                  --カスタマイズ項目140
+                T001_TABLE.RESV141,                 --カスタマイズ項目141
+                T001_TABLE.RESV142,                 --カスタマイズ項目142
+                T001_TABLE.RESV143,                 --カスタマイズ項目143
+                T001_TABLE.RESV144,                 --カスタマイズ項目144
+                T001_TABLE.RESV145,                 --カスタマイズ項目145
+                T001_TABLE.RESV146,                 --カスタマイズ項目146
+                T001_TABLE.RESV147,                 --カスタマイズ項目147
+                T001_TABLE.RESV148,                 --カスタマイズ項目148
+                T001_TABLE.RESV149,                 --カスタマイズ項目149
+                T001_TABLE.RESV150,                 --カスタマイズ項目150
+                T001_TABLE.RESV151,                 --カスタマイズ項目151
+                T001_TABLE.RESV152,                 --カスタマイズ項目152
+                T001_TABLE.RESV153,                 --カスタマイズ項目153
+                T001_TABLE.RESV154,                 --カスタマイズ項目154
+                T001_TABLE.RESV155,                 --カスタマイズ項目155
+                T001_TABLE.RESV156,                 --カスタマイズ項目156
+                T001_TABLE.RESV157,                 --カスタマイズ項目157
+                T001_TABLE.RESV158,                 --カスタマイズ項目158
+                T001_TABLE.RESV159,                 --カスタマイズ項目159
+                T001_TABLE.RESV160,                  --カスタマイズ項目160
+                T001_TABLE.RESV161,                 --カスタマイズ項目151
+                T001_TABLE.RESV162,                 --カスタマイズ項目152
+                T001_TABLE.RESV163,                 --カスタマイズ項目153
+                T001_TABLE.RESV164,                 --カスタマイズ項目154
+                T001_TABLE.RESV165,                 --カスタマイズ項目155
+                T001_TABLE.RESV166,                 --カスタマイズ項目156
+                T001_TABLE.RESV167,                 --カスタマイズ項目157
+                T001_TABLE.RESV168,                 --カスタマイズ項目158
+                T001_TABLE.RESV169,                 --カスタマイズ項目159
+                T001_TABLE.RESV170,                 --カスタマイズ項目160
+                T001_TABLE.RESV171,                 --カスタマイズ項目151
+                T001_TABLE.RESV172,                 --カスタマイズ項目152
+                T001_TABLE.RESV173,                 --カスタマイズ項目153
+                T001_TABLE.RESV174,                 --カスタマイズ項目154
+                T001_TABLE.RESV175,                 --カスタマイズ項目155
+                T001_TABLE.RESV176,                 --カスタマイズ項目156
+                T001_TABLE.RESV177,                 --カスタマイズ項目157
+                T001_TABLE.RESV178,                 --カスタマイズ項目158
+                T001_TABLE.RESV179,                 --カスタマイズ項目159
+                T001_TABLE.RESV180,                 --カスタマイズ項目160
+                T001_TABLE.RESV181,                 --カスタマイズ項目151
+                T001_TABLE.RESV182,                 --カスタマイズ項目152
+                T001_TABLE.RESV183,                 --カスタマイズ項目153
+                T001_TABLE.RESV184,                 --カスタマイズ項目154
+                T001_TABLE.RESV185,                 --カスタマイズ項目155
+                T001_TABLE.RESV186,                 --カスタマイズ項目156
+                T001_TABLE.RESV187,                 --カスタマイズ項目157
+                T001_TABLE.RESV188,                 --カスタマイズ項目158
+                T001_TABLE.RESV189,                 --カスタマイズ項目159
+                T001_TABLE.RESV190,                 --カスタマイズ項目160
+                T001_TABLE.RESV191,                 --カスタマイズ項目151
+                T001_TABLE.RESV192,                 --カスタマイズ項目152
+                T001_TABLE.RESV193,                 --カスタマイズ項目153
+                T001_TABLE.RESV194,                 --カスタマイズ項目154
+                T001_TABLE.RESV195,                 --カスタマイズ項目155
+                T001_TABLE.RESV196,                 --カスタマイズ項目156
+                T001_TABLE.RESV197,                 --カスタマイズ項目157
+                T001_TABLE.RESV198,                 --カスタマイズ項目158
+                T001_TABLE.RESV199,                 --カスタマイズ項目159
+                T001_TABLE.RESV200,                  --カスタマイズ項目160
+                T001_TABLE.RESV201,                 --カスタマイズ項目201
+                T001_TABLE.RESV202,                 --カスタマイズ項目202
+                T001_TABLE.RESV203,                 --カスタマイズ項目203
+                T001_TABLE.RESV204,                 --カスタマイズ項目204
+                T001_TABLE.RESV205,                 --カスタマイズ項目205
+                T001_TABLE.RESV206,                 --カスタマイズ項目206
+                T001_TABLE.RESV207,                 --カスタマイズ項目207
+                T001_TABLE.RESV208,                 --カスタマイズ項目208
+                T001_TABLE.RESV209,                 --カスタマイズ項目209
+                T001_TABLE.RESV210,                 --カスタマイズ項目210
+                T001_TABLE.RESV211,                 --カスタマイズ項目211
+                T001_TABLE.RESV212,                 --カスタマイズ項目212
+                T001_TABLE.RESV213,                 --カスタマイズ項目213
+                T001_TABLE.RESV214,                 --カスタマイズ項目214
+                T001_TABLE.RESV215,                 --カスタマイズ項目215
+                T001_TABLE.RESV216,                 --カスタマイズ項目216
+                T001_TABLE.RESV217,                 --カスタマイズ項目217
+                T001_TABLE.RESV218,                 --カスタマイズ項目218
+                T001_TABLE.RESV219,                 --カスタマイズ項目219
+                T001_TABLE.RESV220,                 --カスタマイズ項目220
+                T001_TABLE.RESV221,                 --カスタマイズ項目221
+                T001_TABLE.RESV222,                 --カスタマイズ項目222
+                T001_TABLE.RESV223,                 --カスタマイズ項目223
+                T001_TABLE.RESV224,                 --カスタマイズ項目224
+                T001_TABLE.RESV225,                 --カスタマイズ項目225
+                T001_TABLE.RESV226,                 --カスタマイズ項目226
+                T001_TABLE.RESV227,                 --カスタマイズ項目227
+                T001_TABLE.RESV228,                 --カスタマイズ項目228
+                T001_TABLE.RESV229,                 --カスタマイズ項目229
+                T001_TABLE.RESV230,                 --カスタマイズ項目230
+                T001_TABLE.RESV231,                 --カスタマイズ項目231
+                T001_TABLE.RESV232,                 --カスタマイズ項目232
+                T001_TABLE.RESV233,                 --カスタマイズ項目233
+                T001_TABLE.RESV234,                 --カスタマイズ項目234
+                T001_TABLE.RESV235,                 --カスタマイズ項目235
+                T001_TABLE.RESV236,                 --カスタマイズ項目236
+                T001_TABLE.RESV237,                 --カスタマイズ項目237
+                T001_TABLE.RESV238,                 --カスタマイズ項目238
+                T001_TABLE.RESV239,                 --カスタマイズ項目239
+                T001_TABLE.RESV240,                 --カスタマイズ項目240
+                T001_TABLE.RESV241,                 --カスタマイズ項目241
+                T001_TABLE.RESV242,                 --カスタマイズ項目242
+                T001_TABLE.RESV243,                 --カスタマイズ項目243
+                T001_TABLE.RESV244,                 --カスタマイズ項目244
+                T001_TABLE.RESV245,                 --カスタマイズ項目245
+                T001_TABLE.RESV246,                 --カスタマイズ項目246
+                T001_TABLE.RESV247,                 --カスタマイズ項目247
+                T001_TABLE.RESV248,                 --カスタマイズ項目248
+                T001_TABLE.RESV249,                 --カスタマイズ項目249
+                T001_TABLE.RESV250,                 --カスタマイズ項目250
+                T001_TABLE.RESV251,                 --カスタマイズ項目251
+                T001_TABLE.RESV252,                 --カスタマイズ項目252
+                T001_TABLE.RESV253,                 --カスタマイズ項目253
+                T001_TABLE.RESV254,                 --カスタマイズ項目254
+                T001_TABLE.RESV255,                 --カスタマイズ項目255
+                T001_TABLE.RESV256,                 --カスタマイズ項目256
+                T001_TABLE.RESV257,                 --カスタマイズ項目257
+                T001_TABLE.RESV258,                 --カスタマイズ項目258
+                T001_TABLE.RESV259,                 --カスタマイズ項目259
+                T001_TABLE.RESV260,                 --カスタマイズ項目260
+                T001_TABLE.RESV261,                 --カスタマイズ項目261
+                T001_TABLE.RESV262,                 --カスタマイズ項目262
+                T001_TABLE.RESV263,                 --カスタマイズ項目263
+                T001_TABLE.RESV264,                 --カスタマイズ項目264
+                T001_TABLE.RESV265,                 --カスタマイズ項目265
+                T001_TABLE.RESV266,                 --カスタマイズ項目266
+                T001_TABLE.RESV267,                 --カスタマイズ項目267
+                T001_TABLE.RESV268,                 --カスタマイズ項目268
+                T001_TABLE.RESV269,                 --カスタマイズ項目269
+                T001_TABLE.RESV270,                 --カスタマイズ項目270
+                T001_TABLE.RESV271,                 --カスタマイズ項目271
+                T001_TABLE.RESV272,                 --カスタマイズ項目272
+                T001_TABLE.RESV273,                 --カスタマイズ項目273
+                T001_TABLE.RESV274,                 --カスタマイズ項目274
+                T001_TABLE.RESV275,                 --カスタマイズ項目275
+                T001_TABLE.RESV276,                 --カスタマイズ項目276
+                T001_TABLE.RESV277,                 --カスタマイズ項目277
+                T001_TABLE.RESV278,                 --カスタマイズ項目278
+                T001_TABLE.RESV279,                 --カスタマイズ項目279
+                T001_TABLE.RESV280,                 --カスタマイズ項目280
+                T001_TABLE.RESV281,                 --カスタマイズ項目281
+                T001_TABLE.RESV282,                 --カスタマイズ項目282
+                T001_TABLE.RESV283,                 --カスタマイズ項目283
+                T001_TABLE.RESV284,                 --カスタマイズ項目284
+                T001_TABLE.RESV285,                 --カスタマイズ項目285
+                T001_TABLE.RESV286,                 --カスタマイズ項目286
+                T001_TABLE.RESV287,                 --カスタマイズ項目287
+                T001_TABLE.RESV288,                 --カスタマイズ項目288
+                T001_TABLE.RESV289,                 --カスタマイズ項目289
+                T001_TABLE.RESV290,                 --カスタマイズ項目290
+                T001_TABLE.RESV291,                 --カスタマイズ項目291
+                T001_TABLE.RESV292,                 --カスタマイズ項目292
+                T001_TABLE.RESV293,                 --カスタマイズ項目293
+                T001_TABLE.RESV294,                 --カスタマイズ項目294
+                T001_TABLE.RESV295,                 --カスタマイズ項目295
+                T001_TABLE.RESV296,                 --カスタマイズ項目296
+                T001_TABLE.RESV297,                 --カスタマイズ項目297
+                T001_TABLE.RESV298,                 --カスタマイズ項目298
+                T001_TABLE.RESV299,                 --カスタマイズ項目299
+                T001_TABLE.RESV300,                 --カスタマイズ項目300
+                T001_TABLE.RESV301,                 --カスタマイズ項目301
+                T001_TABLE.RESV302,                 --カスタマイズ項目302
+                T001_TABLE.RESV303,                 --カスタマイズ項目303
+                T001_TABLE.RESV304,                 --カスタマイズ項目304
+                T001_TABLE.RESV305,                 --カスタマイズ項目305
+                T001_TABLE.RESV306,                 --カスタマイズ項目306
+                T001_TABLE.RESV307,                 --カスタマイズ項目307
+                T001_TABLE.RESV308,                 --カスタマイズ項目308
+                T001_TABLE.RESV309,                 --カスタマイズ項目309
+                T001_TABLE.RESV310,                 --カスタマイズ項目310
+                T001_TABLE.RESV311,                 --カスタマイズ項目311
+                T001_TABLE.RESV312,                 --カスタマイズ項目312
+                T001_TABLE.RESV313,                 --カスタマイズ項目313
+                T001_TABLE.RESV314,                 --カスタマイズ項目314
+                T001_TABLE.RESV315,                 --カスタマイズ項目315
+                T001_TABLE.RESV316,                 --カスタマイズ項目316
+                T001_TABLE.RESV317,                 --カスタマイズ項目317
+                T001_TABLE.RESV318,                 --カスタマイズ項目318
+                T001_TABLE.RESV319,                 --カスタマイズ項目319
+                T001_TABLE.RESV320,                 --カスタマイズ項目320
+                T001_TABLE.RESV321,                 --カスタマイズ項目321
+                T001_TABLE.RESV322,                 --カスタマイズ項目322
+                T001_TABLE.RESV323,                 --カスタマイズ項目323
+                T001_TABLE.RESV324,                 --カスタマイズ項目324
+                T001_TABLE.RESV325,                 --カスタマイズ項目325
+                T001_TABLE.RESV326,                 --カスタマイズ項目326
+                T001_TABLE.RESV327,                 --カスタマイズ項目327
+                T001_TABLE.RESV328,                 --カスタマイズ項目328
+                T001_TABLE.RESV329,                 --カスタマイズ項目329
+                T001_TABLE.RESV330,                 --カスタマイズ項目330
+                T001_TABLE.RESV331,                 --カスタマイズ項目331
+                T001_TABLE.RESV332,                 --カスタマイズ項目332
+                T001_TABLE.RESV333,                 --カスタマイズ項目333
+                T001_TABLE.RESV334,                 --カスタマイズ項目334
+                T001_TABLE.RESV335,                 --カスタマイズ項目335
+                T001_TABLE.RESV336,                 --カスタマイズ項目336
+                T001_TABLE.RESV337,                 --カスタマイズ項目337
+                T001_TABLE.RESV338,                 --カスタマイズ項目338
+                T001_TABLE.RESV339,                 --カスタマイズ項目339
+                T001_TABLE.RESV340,                 --カスタマイズ項目340
+                T001_TABLE.RESV341,                 --カスタマイズ項目341
+                T001_TABLE.RESV342,                 --カスタマイズ項目342
+                T001_TABLE.RESV343,                 --カスタマイズ項目343
+                T001_TABLE.RESV344,                 --カスタマイズ項目344
+                T001_TABLE.RESV345,                 --カスタマイズ項目345
+                T001_TABLE.RESV346,                 --カスタマイズ項目346
+                T001_TABLE.RESV347,                 --カスタマイズ項目347
+                T001_TABLE.RESV348,                 --カスタマイズ項目348
+                T001_TABLE.RESV349,                 --カスタマイズ項目349
+                T001_TABLE.RESV350,                 --カスタマイズ項目350
+                T001_TABLE.RESV351,                 --カスタマイズ項目351
+                T001_TABLE.RESV352,                 --カスタマイズ項目352
+                T001_TABLE.RESV353,                 --カスタマイズ項目353
+                T001_TABLE.RESV354,                 --カスタマイズ項目354
+                T001_TABLE.RESV355,                 --カスタマイズ項目355
+                T001_TABLE.RESV356,                 --カスタマイズ項目356
+                T001_TABLE.RESV357,                 --カスタマイズ項目357
+                T001_TABLE.RESV358,                 --カスタマイズ項目358
+                T001_TABLE.RESV359,                 --カスタマイズ項目359
+                T001_TABLE.RESV360,                 --カスタマイズ項目360
+                T001_TABLE.RESV361,                 --カスタマイズ項目361
+                T001_TABLE.RESV362,                 --カスタマイズ項目362
+                T001_TABLE.RESV363,                 --カスタマイズ項目363
+                T001_TABLE.RESV364,                 --カスタマイズ項目364
+                T001_TABLE.RESV365,                 --カスタマイズ項目365
+                T001_TABLE.RESV366,                 --カスタマイズ項目366
+                T001_TABLE.RESV367,                 --カスタマイズ項目367
+                T001_TABLE.RESV368,                 --カスタマイズ項目368
+                T001_TABLE.RESV369,                 --カスタマイズ項目369
+                T001_TABLE.RESV370,                 --カスタマイズ項目370
+                T001_TABLE.RESV371,                 --カスタマイズ項目371
+                T001_TABLE.RESV372,                 --カスタマイズ項目372
+                T001_TABLE.RESV373,                 --カスタマイズ項目373
+                T001_TABLE.RESV374,                 --カスタマイズ項目374
+                T001_TABLE.RESV375,                 --カスタマイズ項目375
+                T001_TABLE.RESV376,                 --カスタマイズ項目376
+                T001_TABLE.RESV377,                 --カスタマイズ項目377
+                T001_TABLE.RESV378,                 --カスタマイズ項目378
+                T001_TABLE.RESV379,                 --カスタマイズ項目379
+                T001_TABLE.RESV380,                 --カスタマイズ項目380
+                T001_TABLE.RESV381,                 --カスタマイズ項目381
+                T001_TABLE.RESV382,                 --カスタマイズ項目382
+                T001_TABLE.RESV383,                 --カスタマイズ項目383
+                T001_TABLE.RESV384,                 --カスタマイズ項目384
+                T001_TABLE.RESV385,                 --カスタマイズ項目385
+                T001_TABLE.RESV386,                 --カスタマイズ項目386
+                T001_TABLE.RESV387,                 --カスタマイズ項目387
+                T001_TABLE.RESV388,                 --カスタマイズ項目388
+                T001_TABLE.RESV389,                 --カスタマイズ項目389
+                T001_TABLE.RESV390,                 --カスタマイズ項目390
+                T001_TABLE.RESV391,                 --カスタマイズ項目391
+                T001_TABLE.RESV392,                 --カスタマイズ項目392
+                T001_TABLE.RESV393,                 --カスタマイズ項目393
+                T001_TABLE.RESV394,                 --カスタマイズ項目394
+                T001_TABLE.RESV395,                 --カスタマイズ項目395
+                T001_TABLE.RESV396,                 --カスタマイズ項目396
+                T001_TABLE.RESV397,                 --カスタマイズ項目397
+                T001_TABLE.RESV398,                 --カスタマイズ項目398
+                T001_TABLE.RESV399,                 --カスタマイズ項目399
+                T001_TABLE.RESV400                 --カスタマイズ項目400
+            );
+        EXCEPTION
+            --# その他例外の処理
+            WHEN OTHERS THEN
+                N_RET := C_RET_NG;                --戻り値を異常終了に設定すること
+                --DBMS_OUTPUT.PUT_LINE(SQLCODE);    --メッセージコード出力
+                --DBMS_OUTPUT.PUT_LINE(SQLERRM);    --メッセージ出力
+                RAISE EX_INSERT_T001_OHRS;
+        END;
+    --# 顧客情報の更新処理
+    WHEN C_TYT001_TABLE.UPDATE THEN
+        BEGIN
+            UPDATE T001_BIZ_CUST
+               SET 
+                 --BIZ_CUST_ID            = T001_TABLE.BIZ_CUST_ID,             --業務別顧客ID
+                 --INS_USER_ID              = T001_TABLE.INS_USER_ID,             --登録ユーザーID
+                 --INS_DT                   = T001_TABLE.INS_DT,                  --登録日時
+                   UPD_USER_ID              = T001_TABLE.UPD_USER_ID,             --修正ユーザーID
+                   UPD_DT                   = T001_TABLE.UPD_DT,                  --修正日時
+                 --BIZ_ID                   = T001_TABLE.BIZ_ID,                  --事業ID
+                 --CUST_ID                  = T001_TABLE.CUST_ID,                 --顧客ID
+                 --ADDR_ID                  = T001_TABLE.ADDR_ID,                 --住所ID
+                 --ADDR_PREF_CD             = T001_TABLE.ADDR_PREF_CD,            --住所コード（都道府県）
+                 --ADDR_CITY_CD             = T001_TABLE.ADDR_CITY_CD,            --住所コード（群市区）
+                 --ADDR_ZONE_CD             = T001_TABLE.ADDR_ZONE_CD,            --住所コード（町村）
+                 --CONTACT_TEL_NO           = T001_TABLE.CONTACT_TEL_NO,          --連絡先電話番号
+                 --FIND_TEL_NO              = T001_TABLE.FIND_TEL_NO,             --検索電話番号
+                   CALL_RST_ID              = T001_TABLE.CALL_RST_ID,             --最新コール結果
+                   CALL_RST_RANK_CD         = T001_TABLE.CALL_RST_RANK_CD,        --最新ランク区分
+                   CALL_DT                  = T001_TABLE.CALL_DT,                 --最新コール日時
+                   APO_DT                   = T001_TABLE.APO_DT,                  --客先指定日時
+                   CALL_USER_ID             = T001_TABLE.CALL_USER_ID,            --営業員ID
+                   CALL_USER_NM             = T001_TABLE.CALL_USER_NM,            --営業員氏名
+                   GRT001_TABLE.ID          = T001_TABLE.GRT001_TABLE.ID,                  --グループ
+                   SUB_GRT001_TABLE.ID      = T001_TABLE.SUB_GRT001_TABLE.ID,              --サブグループID
+                   LIST_ID                  = T001_TABLE.LIST_ID,                 --リストID
+                   LIST_TYPE_ID             = T001_TABLE.LIST_TYPE_ID,            --リストタイプID
+                   LIST_SEQNO               = T001_TABLE.LIST_SEQNO,              --リスト内シーケンス番号
+                   LOCKING_USER_ID          = T001_TABLE.LOCKING_USER_ID,         --使用中ユーザーID
+                   LOCKING_TS               = T001_TABLE.LOCKING_TS,              --使用開始タイムスタンプ
+                   EDIT_FLG                 = T001_TABLE.EDIT_FLG,                --表示フラグ
+                   EDIT_RULE                = T001_TABLE.EDIT_RULE,               --編集ルール
+                   EDIT_REMARKS             = T001_TABLE.EDIT_REMARKS,            --編集備考
+                   INDST_BASE_ID            = T001_TABLE.INDST_BASE_ID,           --大業種ID
+                   INDST_DETAIL_ID          = T001_TABLE.INDST_DETAIL_ID,         --業種詳細情報ID
+                   CORT001_TABLE.CODE       = T001_TABLE.CORT001_TABLE.CODE,               --法人格コード
+                   APO_CALL_USER_ID         = T001_TABLE.APO_CALL_USER_ID,
+                   VISITED_CALL_USER_ID     = T001_TABLE.VISITED_CALL_USER_ID,
+                   RESV1                    = T001_TABLE.RESV1,                   --カスタマイズ項目1
+                   RESV2                    = T001_TABLE.RESV2,                   --カスタマイズ項目2
+                   RESV3                    = T001_TABLE.RESV3,                   --カスタマイズ項目3
+                   RESV4                    = T001_TABLE.RESV4,                   --カスタマイズ項目4
+                   RESV5                    = T001_TABLE.RESV5,                   --カスタマイズ項目5
+                   RESV6                    = T001_TABLE.RESV6,                   --カスタマイズ項目6
+                   RESV7                    = T001_TABLE.RESV7,                   --カスタマイズ項目7
+                   RESV8                    = T001_TABLE.RESV8,                   --カスタマイズ項目8
+                   RESV9                    = T001_TABLE.RESV9,                   --カスタマイズ項目9
+                   RESV10                   = T001_TABLE.RESV10,                  --カスタマイズ項目10
+                   RESV11                   = T001_TABLE.RESV11,                  --カスタマイズ項目11
+                   RESV12                   = T001_TABLE.RESV12,                  --カスタマイズ項目12
+                   RESV13                   = T001_TABLE.RESV13,                  --カスタマイズ項目13
+                   RESV14                   = T001_TABLE.RESV14,                  --カスタマイズ項目14
+                   RESV15                   = T001_TABLE.RESV15,                  --カスタマイズ項目15
+                   RESV16                   = T001_TABLE.RESV16,                  --カスタマイズ項目16
+                   RESV17                   = T001_TABLE.RESV17,                  --カスタマイズ項目17
+                   RESV18                   = T001_TABLE.RESV18,                  --カスタマイズ項目18
+                   RESV19                   = T001_TABLE.RESV19,                  --カスタマイズ項目19
+                   RESV20                   = T001_TABLE.RESV20,                  --カスタマイズ項目20
+                   RESV21                   = T001_TABLE.RESV21,                  --カスタマイズ項目21
+                   RESV22                   = T001_TABLE.RESV22,                  --カスタマイズ項目22
+                   RESV23                   = T001_TABLE.RESV23,                  --カスタマイズ項目23
+                   RESV24                   = T001_TABLE.RESV24,                  --カスタマイズ項目24
+                   RESV25                   = T001_TABLE.RESV25,                  --カスタマイズ項目25
+                   RESV26                   = T001_TABLE.RESV26,                  --カスタマイズ項目26
+                   RESV27                   = T001_TABLE.RESV27,                  --カスタマイズ項目27
+                   RESV28                   = T001_TABLE.RESV28,                  --カスタマイズ項目28
+                   RESV29                   = T001_TABLE.RESV29,                  --カスタマイズ項目29
+                   RESV30                   = T001_TABLE.RESV30,                  --カスタマイズ項目30
+                   RESV31                   = T001_TABLE.RESV31,                  --カスタマイズ項目31
+                   RESV32                   = T001_TABLE.RESV32,                  --カスタマイズ項目32
+                   RESV33                   = T001_TABLE.RESV33,                  --カスタマイズ項目33
+                   RESV34                   = T001_TABLE.RESV34,                  --カスタマイズ項目34
+                   RESV35                   = T001_TABLE.RESV35,                  --カスタマイズ項目35
+                   RESV36                   = T001_TABLE.RESV36,                  --カスタマイズ項目36
+                   RESV37                   = T001_TABLE.RESV37,                  --カスタマイズ項目37
+                   RESV38                   = T001_TABLE.RESV38,                  --カスタマイズ項目38
+                   RESV39                   = T001_TABLE.RESV39,                  --カスタマイズ項目39
+                   RESV40                   = T001_TABLE.RESV40,                  --カスタマイズ項目40
+                   RESV41                   = T001_TABLE.RESV41,                  --カスタマイズ項目41
+                   RESV42                   = T001_TABLE.RESV42,                  --カスタマイズ項目42
+                   RESV43                   = T001_TABLE.RESV43,                  --カスタマイズ項目43
+                   RESV44                   = T001_TABLE.RESV44,                  --カスタマイズ項目44
+                   RESV45                   = T001_TABLE.RESV45,                  --カスタマイズ項目45
+                   RESV46                   = T001_TABLE.RESV46,                  --カスタマイズ項目46
+                   RESV47                   = T001_TABLE.RESV47,                  --カスタマイズ項目47
+                   RESV48                   = T001_TABLE.RESV48,                  --カスタマイズ項目48
+                   RESV49                   = T001_TABLE.RESV49,                  --カスタマイズ項目49
+                   RESV50                   = T001_TABLE.RESV50,                  --カスタマイズ項目50
+                   RESV51                   = T001_TABLE.RESV51,                  --カスタマイズ項目51
+                   RESV52                   = T001_TABLE.RESV52,                  --カスタマイズ項目52
+                   RESV53                   = T001_TABLE.RESV53,                  --カスタマイズ項目53
+                   RESV54                   = T001_TABLE.RESV54,                  --カスタマイズ項目54
+                   RESV55                   = T001_TABLE.RESV55,                  --カスタマイズ項目55
+                   RESV56                   = T001_TABLE.RESV56,                  --カスタマイズ項目56
+                   RESV57                   = T001_TABLE.RESV57,                  --カスタマイズ項目57
+                   RESV58                   = T001_TABLE.RESV58,                  --カスタマイズ項目58
+                   RESV59                   = T001_TABLE.RESV59,                  --カスタマイズ項目59
+                   RESV60                   = T001_TABLE.RESV60,                  --カスタマイズ項目60
+                   RESV61                   = T001_TABLE.RESV61,                  --カスタマイズ項目61
+                   RESV62                   = T001_TABLE.RESV62,                  --カスタマイズ項目62
+                   RESV63                   = T001_TABLE.RESV63,                  --カスタマイズ項目63
+                   RESV64                   = T001_TABLE.RESV64,                  --カスタマイズ項目64
+                   RESV65                   = T001_TABLE.RESV65,                  --カスタマイズ項目65
+                   RESV66                   = T001_TABLE.RESV66,                  --カスタマイズ項目66
+                   RESV67                   = T001_TABLE.RESV67,                  --カスタマイズ項目67
+                   RESV68                   = T001_TABLE.RESV68,                  --カスタマイズ項目68
+                   RESV69                   = T001_TABLE.RESV69,                  --カスタマイズ項目69
+                   RESV70                   = T001_TABLE.RESV70,                  --カスタマイズ項目70
+                   RESV71                   = T001_TABLE.RESV71,                  --カスタマイズ項目71
+                   RESV72                   = T001_TABLE.RESV72,                  --カスタマイズ項目72
+                   RESV73                   = T001_TABLE.RESV73,                  --カスタマイズ項目73
+                   RESV74                   = T001_TABLE.RESV74,                  --カスタマイズ項目74
+                   RESV75                   = T001_TABLE.RESV75,                  --カスタマイズ項目75
+                   RESV76                   = T001_TABLE.RESV76,                  --カスタマイズ項目76
+                   RESV77                   = T001_TABLE.RESV77,                  --カスタマイズ項目77
+                   RESV78                   = T001_TABLE.RESV78,                  --カスタマイズ項目78
+                   RESV79                   = T001_TABLE.RESV79,                  --カスタマイズ項目79
+                   RESV80                   = T001_TABLE.RESV80,                  --カスタマイズ項目80
+                   RESV81                   = T001_TABLE.RESV81,                  --カスタマイズ項目81
+                   RESV82                   = T001_TABLE.RESV82,                  --カスタマイズ項目82
+                   RESV83                   = T001_TABLE.RESV83,                  --カスタマイズ項目83
+                   RESV84                   = T001_TABLE.RESV84,                  --カスタマイズ項目84
+                   RESV85                   = T001_TABLE.RESV85,                  --カスタマイズ項目85
+                   RESV86                   = T001_TABLE.RESV86,                  --カスタマイズ項目86
+                   RESV87                   = T001_TABLE.RESV87,                  --カスタマイズ項目87
+                   RESV88                   = T001_TABLE.RESV88,                  --カスタマイズ項目88
+                   RESV89                   = T001_TABLE.RESV89,                  --カスタマイズ項目89
+                   RESV90                   = T001_TABLE.RESV90,                  --カスタマイズ項目90
+                   RESV91                   = T001_TABLE.RESV91,                  --カスタマイズ項目91
+                   RESV92                   = T001_TABLE.RESV92,                  --カスタマイズ項目92
+                   RESV93                   = T001_TABLE.RESV93,                  --カスタマイズ項目93
+                   RESV94                   = T001_TABLE.RESV94,                  --カスタマイズ項目94
+                   RESV95                   = T001_TABLE.RESV95,                  --カスタマイズ項目95
+                   RESV96                   = T001_TABLE.RESV96,                  --カスタマイズ項目96
+                   RESV97                   = T001_TABLE.RESV97,                  --カスタマイズ項目97
+                   RESV98                   = T001_TABLE.RESV98,                  --カスタマイズ項目98
+                   RESV99                   = T001_TABLE.RESV99,                  --カスタマイズ項目99
+                   RESV100                  = T001_TABLE.RESV100,                 --カスタマイズ項目100
+                   RESV101                  = T001_TABLE.RESV101,                 --カスタマイズ項目101
+                   RESV102                  = T001_TABLE.RESV102,                 --カスタマイズ項目102
+                   RESV103                  = T001_TABLE.RESV103,                 --カスタマイズ項目103
+                   RESV104                  = T001_TABLE.RESV104,                 --カスタマイズ項目104
+                   RESV105                  = T001_TABLE.RESV105,                 --カスタマイズ項目105
+                   RESV106                  = T001_TABLE.RESV106,                 --カスタマイズ項目106
+                   RESV107                  = T001_TABLE.RESV107,                 --カスタマイズ項目107
+                   RESV108                  = T001_TABLE.RESV108,                 --カスタマイズ項目108
+                   RESV109                  = T001_TABLE.RESV109,                 --カスタマイズ項目109
+                   RESV110                  = T001_TABLE.RESV110,                 --カスタマイズ項目110
+                   RESV111                  = T001_TABLE.RESV111,                 --カスタマイズ項目111
+                   RESV112                  = T001_TABLE.RESV112,                 --カスタマイズ項目112
+                   RESV113                  = T001_TABLE.RESV113,                 --カスタマイズ項目113
+                   RESV114                  = T001_TABLE.RESV114,                 --カスタマイズ項目114
+                   RESV115                  = T001_TABLE.RESV115,                 --カスタマイズ項目115
+                   RESV116                  = T001_TABLE.RESV116,                 --カスタマイズ項目116
+                   RESV117                  = T001_TABLE.RESV117,                 --カスタマイズ項目117
+                   RESV118                  = T001_TABLE.RESV118,                 --カスタマイズ項目118
+                   RESV119                  = T001_TABLE.RESV119,                 --カスタマイズ項目119
+                   RESV120                  = T001_TABLE.RESV120,                 --カスタマイズ項目120
+                   RESV121                  = T001_TABLE.RESV121,                 --カスタマイズ項目121
+                   RESV122                  = T001_TABLE.RESV122,                 --カスタマイズ項目122
+                   RESV123                  = T001_TABLE.RESV123,                 --カスタマイズ項目123
+                   RESV124                  = T001_TABLE.RESV124,                 --カスタマイズ項目124
+                   RESV125                  = T001_TABLE.RESV125,                 --カスタマイズ項目125
+                   RESV126                  = T001_TABLE.RESV126,                 --カスタマイズ項目126
+                   RESV127                  = T001_TABLE.RESV127,                 --カスタマイズ項目127
+                   RESV128                  = T001_TABLE.RESV128,                 --カスタマイズ項目128
+                   RESV129                  = T001_TABLE.RESV129,                 --カスタマイズ項目129
+                   RESV130                  = T001_TABLE.RESV130,                 --カスタマイズ項目130
+                   RESV131                  = T001_TABLE.RESV131,                 --カスタマイズ項目131
+                   RESV132                  = T001_TABLE.RESV132,                 --カスタマイズ項目132
+                   RESV133                  = T001_TABLE.RESV133,                 --カスタマイズ項目133
+                   RESV134                  = T001_TABLE.RESV134,                 --カスタマイズ項目134
+                   RESV135                  = T001_TABLE.RESV135,                 --カスタマイズ項目135
+                   RESV136                  = T001_TABLE.RESV136,                 --カスタマイズ項目136
+                   RESV137                  = T001_TABLE.RESV137,                 --カスタマイズ項目137
+                   RESV138                  = T001_TABLE.RESV138,                 --カスタマイズ項目138
+                   RESV139                  = T001_TABLE.RESV139,                 --カスタマイズ項目139
+                   RESV140                  = T001_TABLE.RESV140,                 --カスタマイズ項目140
+                   RESV141                  = T001_TABLE.RESV141,                 --カスタマイズ項目141
+                   RESV142                  = T001_TABLE.RESV142,                 --カスタマイズ項目142
+                   RESV143                  = T001_TABLE.RESV143,                 --カスタマイズ項目143
+                   RESV144                  = T001_TABLE.RESV144,                 --カスタマイズ項目144
+                   RESV145                  = T001_TABLE.RESV145,                 --カスタマイズ項目145
+                   RESV146                  = T001_TABLE.RESV146,                 --カスタマイズ項目146
+                   RESV147                  = T001_TABLE.RESV147,                 --カスタマイズ項目147
+                   RESV148                  = T001_TABLE.RESV148,                 --カスタマイズ項目148
+                   RESV149                  = T001_TABLE.RESV149,                 --カスタマイズ項目149
+                   RESV150                  = T001_TABLE.RESV150,                 --カスタマイズ項目150
+                   RESV151                  = T001_TABLE.RESV151,                 --カスタマイズ項目151
+                   RESV152                  = T001_TABLE.RESV152,                 --カスタマイズ項目152
+                   RESV153                  = T001_TABLE.RESV153,                 --カスタマイズ項目153
+                   RESV154                  = T001_TABLE.RESV154,                 --カスタマイズ項目154
+                   RESV155                  = T001_TABLE.RESV155,                 --カスタマイズ項目155
+                   RESV156                  = T001_TABLE.RESV156,                 --カスタマイズ項目156
+                   RESV157                  = T001_TABLE.RESV157,                 --カスタマイズ項目157
+                   RESV158                  = T001_TABLE.RESV158,                 --カスタマイズ項目158
+                   RESV159                  = T001_TABLE.RESV159,                 --カスタマイズ項目159
+                   RESV160                  = T001_TABLE.RESV160,                  --カスタマイズ項目160
+                   RESV161                  = T001_TABLE.RESV161,                 --カスタマイズ項目151
+                   RESV162                  = T001_TABLE.RESV162,                 --カスタマイズ項目152
+                   RESV163                  = T001_TABLE.RESV163,                 --カスタマイズ項目153
+                   RESV164                  = T001_TABLE.RESV164,                 --カスタマイズ項目154
+                   RESV165                  = T001_TABLE.RESV165,                 --カスタマイズ項目155
+                   RESV166                  = T001_TABLE.RESV166,                 --カスタマイズ項目156
+                   RESV167                  = T001_TABLE.RESV167,                 --カスタマイズ項目157
+                   RESV168                  = T001_TABLE.RESV168,                 --カスタマイズ項目158
+                   RESV169                  = T001_TABLE.RESV169,                 --カスタマイズ項目159
+                   RESV170                  = T001_TABLE.RESV170,                 --カスタマイズ項目160
+                   RESV171                  = T001_TABLE.RESV171,                 --カスタマイズ項目151
+                   RESV172                  = T001_TABLE.RESV172,                 --カスタマイズ項目152
+                   RESV173                  = T001_TABLE.RESV173,                 --カスタマイズ項目153
+                   RESV174                  = T001_TABLE.RESV174,                 --カスタマイズ項目154
+                   RESV175                  = T001_TABLE.RESV175,                 --カスタマイズ項目155
+                   RESV176                  = T001_TABLE.RESV176,                 --カスタマイズ項目156
+                   RESV177                  = T001_TABLE.RESV177,                 --カスタマイズ項目157
+                   RESV178                  = T001_TABLE.RESV178,                 --カスタマイズ項目158
+                   RESV179                  = T001_TABLE.RESV179,                 --カスタマイズ項目159
+                   RESV180                  = T001_TABLE.RESV180,                 --カスタマイズ項目160
+                   RESV181                  = T001_TABLE.RESV181,                 --カスタマイズ項目151
+                   RESV182                  = T001_TABLE.RESV182,                 --カスタマイズ項目152
+                   RESV183                  = T001_TABLE.RESV183,                 --カスタマイズ項目153
+                   RESV184                  = T001_TABLE.RESV184,                 --カスタマイズ項目154
+                   RESV185                  = T001_TABLE.RESV185,                 --カスタマイズ項目155
+                   RESV186                  = T001_TABLE.RESV186,                 --カスタマイズ項目156
+                   RESV187                  = T001_TABLE.RESV187,                 --カスタマイズ項目157
+                   RESV188                  = T001_TABLE.RESV188,                 --カスタマイズ項目158
+                   RESV189                  = T001_TABLE.RESV189,                 --カスタマイズ項目159
+                   RESV190                  = T001_TABLE.RESV190,                 --カスタマイズ項目160
+                   RESV191                  = T001_TABLE.RESV191,                 --カスタマイズ項目151
+                   RESV192                  = T001_TABLE.RESV192,                 --カスタマイズ項目152
+                   RESV193                  = T001_TABLE.RESV193,                 --カスタマイズ項目153
+                   RESV194                  = T001_TABLE.RESV194,                 --カスタマイズ項目154
+                   RESV195                  = T001_TABLE.RESV195,                 --カスタマイズ項目155
+                   RESV196                  = T001_TABLE.RESV196,                 --カスタマイズ項目156
+                   RESV197                  = T001_TABLE.RESV197,                 --カスタマイズ項目157
+                   RESV198                  = T001_TABLE.RESV198,                 --カスタマイズ項目158
+                   RESV199                  = T001_TABLE.RESV199,                 --カスタマイズ項目159
+                   RESV200                  = T001_TABLE.RESV200,                  --カスタマイズ項目160
+                   RESV201                  = T001_TABLE.RESV201,                 --カスタマイズ項目201
+                   RESV202                  = T001_TABLE.RESV202,                 --カスタマイズ項目202
+                   RESV203                  = T001_TABLE.RESV203,                 --カスタマイズ項目203
+                   RESV204                  = T001_TABLE.RESV204,                 --カスタマイズ項目204
+                   RESV205                  = T001_TABLE.RESV205,                 --カスタマイズ項目205
+                   RESV206                  = T001_TABLE.RESV206,                 --カスタマイズ項目206
+                   RESV207                  = T001_TABLE.RESV207,                 --カスタマイズ項目207
+                   RESV208                  = T001_TABLE.RESV208,                 --カスタマイズ項目208
+                   RESV209                  = T001_TABLE.RESV209,                 --カスタマイズ項目209
+                   RESV210                  = T001_TABLE.RESV210,                 --カスタマイズ項目210
+                   RESV211                  = T001_TABLE.RESV211,                 --カスタマイズ項目211
+                   RESV212                  = T001_TABLE.RESV212,                 --カスタマイズ項目212
+                   RESV213                  = T001_TABLE.RESV213,                 --カスタマイズ項目213
+                   RESV214                  = T001_TABLE.RESV214,                 --カスタマイズ項目214
+                   RESV215                  = T001_TABLE.RESV215,                 --カスタマイズ項目215
+                   RESV216                  = T001_TABLE.RESV216,                 --カスタマイズ項目216
+                   RESV217                  = T001_TABLE.RESV217,                 --カスタマイズ項目217
+                   RESV218                  = T001_TABLE.RESV218,                 --カスタマイズ項目218
+                   RESV219                  = T001_TABLE.RESV219,                 --カスタマイズ項目219
+                   RESV220                  = T001_TABLE.RESV220,                 --カスタマイズ項目220
+                   RESV221                  = T001_TABLE.RESV221,                 --カスタマイズ項目221
+                   RESV222                  = T001_TABLE.RESV222,                 --カスタマイズ項目222
+                   RESV223                  = T001_TABLE.RESV223,                 --カスタマイズ項目223
+                   RESV224                  = T001_TABLE.RESV224,                 --カスタマイズ項目224
+                   RESV225                  = T001_TABLE.RESV225,                 --カスタマイズ項目225
+                   RESV226                  = T001_TABLE.RESV226,                 --カスタマイズ項目226
+                   RESV227                  = T001_TABLE.RESV227,                 --カスタマイズ項目227
+                   RESV228                  = T001_TABLE.RESV228,                 --カスタマイズ項目228
+                   RESV229                  = T001_TABLE.RESV229,                 --カスタマイズ項目229
+                   RESV230                  = T001_TABLE.RESV230,                 --カスタマイズ項目230
+                   RESV231                  = T001_TABLE.RESV231,                 --カスタマイズ項目231
+                   RESV232                  = T001_TABLE.RESV232,                 --カスタマイズ項目232
+                   RESV233                  = T001_TABLE.RESV233,                 --カスタマイズ項目233
+                   RESV234                  = T001_TABLE.RESV234,                 --カスタマイズ項目234
+                   RESV235                  = T001_TABLE.RESV235,                 --カスタマイズ項目235
+                   RESV236                  = T001_TABLE.RESV236,                 --カスタマイズ項目236
+                   RESV237                  = T001_TABLE.RESV237,                 --カスタマイズ項目237
+                   RESV238                  = T001_TABLE.RESV238,                 --カスタマイズ項目238
+                   RESV239                  = T001_TABLE.RESV239,                 --カスタマイズ項目239
+                   RESV240                  = T001_TABLE.RESV240,                 --カスタマイズ項目240
+                   RESV241                  = T001_TABLE.RESV241,                 --カスタマイズ項目241
+                   RESV242                  = T001_TABLE.RESV242,                 --カスタマイズ項目242
+                   RESV243                  = T001_TABLE.RESV243,                 --カスタマイズ項目243
+                   RESV244                  = T001_TABLE.RESV244,                 --カスタマイズ項目244
+                   RESV245                  = T001_TABLE.RESV245,                 --カスタマイズ項目245
+                   RESV246                  = T001_TABLE.RESV246,                 --カスタマイズ項目246
+                   RESV247                  = T001_TABLE.RESV247,                 --カスタマイズ項目247
+                   RESV248                  = T001_TABLE.RESV248,                 --カスタマイズ項目248
+                   RESV249                  = T001_TABLE.RESV249,                 --カスタマイズ項目249
+                   RESV250                  = T001_TABLE.RESV250,                 --カスタマイズ項目250
+                   RESV251                  = T001_TABLE.RESV251,                 --カスタマイズ項目251
+                   RESV252                  = T001_TABLE.RESV252,                 --カスタマイズ項目252
+                   RESV253                  = T001_TABLE.RESV253,                 --カスタマイズ項目253
+                   RESV254                  = T001_TABLE.RESV254,                 --カスタマイズ項目254
+                   RESV255                  = T001_TABLE.RESV255,                 --カスタマイズ項目255
+                   RESV256                  = T001_TABLE.RESV256,                 --カスタマイズ項目256
+                   RESV257                  = T001_TABLE.RESV257,                 --カスタマイズ項目257
+                   RESV258                  = T001_TABLE.RESV258,                 --カスタマイズ項目258
+                   RESV259                  = T001_TABLE.RESV259,                 --カスタマイズ項目259
+                   RESV260                  = T001_TABLE.RESV260,                 --カスタマイズ項目260
+                   RESV261                  = T001_TABLE.RESV261,                 --カスタマイズ項目261
+                   RESV262                  = T001_TABLE.RESV262,                 --カスタマイズ項目262
+                   RESV263                  = T001_TABLE.RESV263,                 --カスタマイズ項目263
+                   RESV264                  = T001_TABLE.RESV264,                 --カスタマイズ項目264
+                   RESV265                  = T001_TABLE.RESV265,                 --カスタマイズ項目265
+                   RESV266                  = T001_TABLE.RESV266,                 --カスタマイズ項目266
+                   RESV267                  = T001_TABLE.RESV267,                 --カスタマイズ項目267
+                   RESV268                  = T001_TABLE.RESV268,                 --カスタマイズ項目268
+                   RESV269                  = T001_TABLE.RESV269,                 --カスタマイズ項目269
+                   RESV270                  = T001_TABLE.RESV270,                 --カスタマイズ項目270
+                   RESV271                  = T001_TABLE.RESV271,                 --カスタマイズ項目271
+                   RESV272                  = T001_TABLE.RESV272,                 --カスタマイズ項目272
+                   RESV273                  = T001_TABLE.RESV273,                 --カスタマイズ項目273
+                   RESV274                  = T001_TABLE.RESV274,                 --カスタマイズ項目274
+                   RESV275                  = T001_TABLE.RESV275,                 --カスタマイズ項目275
+                   RESV276                  = T001_TABLE.RESV276,                 --カスタマイズ項目276
+                   RESV277                  = T001_TABLE.RESV277,                 --カスタマイズ項目277
+                   RESV278                  = T001_TABLE.RESV278,                 --カスタマイズ項目278
+                   RESV279                  = T001_TABLE.RESV279,                 --カスタマイズ項目279
+                   RESV280                  = T001_TABLE.RESV280,                 --カスタマイズ項目280
+                   RESV281                  = T001_TABLE.RESV281,                 --カスタマイズ項目281
+                   RESV282                  = T001_TABLE.RESV282,                 --カスタマイズ項目282
+                   RESV283                  = T001_TABLE.RESV283,                 --カスタマイズ項目283
+                   RESV284                  = T001_TABLE.RESV284,                 --カスタマイズ項目284
+                   RESV285                  = T001_TABLE.RESV285,                 --カスタマイズ項目285
+                   RESV286                  = T001_TABLE.RESV286,                 --カスタマイズ項目286
+                   RESV287                  = T001_TABLE.RESV287,                 --カスタマイズ項目287
+                   RESV288                  = T001_TABLE.RESV288,                 --カスタマイズ項目288
+                   RESV289                  = T001_TABLE.RESV289,                 --カスタマイズ項目289
+                   RESV290                  = T001_TABLE.RESV290,                 --カスタマイズ項目290
+                   RESV291                  = T001_TABLE.RESV291,                 --カスタマイズ項目291
+                   RESV292                  = T001_TABLE.RESV292,                 --カスタマイズ項目292
+                   RESV293                  = T001_TABLE.RESV293,                 --カスタマイズ項目293
+                   RESV294                  = T001_TABLE.RESV294,                 --カスタマイズ項目294
+                   RESV295                  = T001_TABLE.RESV295,                 --カスタマイズ項目295
+                   RESV296                  = T001_TABLE.RESV296,                 --カスタマイズ項目296
+                   RESV297                  = T001_TABLE.RESV297,                 --カスタマイズ項目297
+                   RESV298                  = T001_TABLE.RESV298,                 --カスタマイズ項目298
+                   RESV299                  = T001_TABLE.RESV299,                 --カスタマイズ項目299
+                   RESV300                  = T001_TABLE.RESV300,                  --カスタマイズ項目300
+                   RESV301                  = T001_TABLE.RESV301,                 --カスタマイズ項目301
+                   RESV302                  = T001_TABLE.RESV302,                 --カスタマイズ項目302
+                   RESV303                  = T001_TABLE.RESV303,                 --カスタマイズ項目303
+                   RESV304                  = T001_TABLE.RESV304,                 --カスタマイズ項目304
+                   RESV305                  = T001_TABLE.RESV305,                 --カスタマイズ項目305
+                   RESV306                  = T001_TABLE.RESV306,                 --カスタマイズ項目306
+                   RESV307                  = T001_TABLE.RESV307,                 --カスタマイズ項目307
+                   RESV308                  = T001_TABLE.RESV308,                 --カスタマイズ項目308
+                   RESV309                  = T001_TABLE.RESV309,                 --カスタマイズ項目309
+                   RESV310                  = T001_TABLE.RESV310,                 --カスタマイズ項目310
+                   RESV311                  = T001_TABLE.RESV311,                 --カスタマイズ項目311
+                   RESV312                  = T001_TABLE.RESV312,                 --カスタマイズ項目312
+                   RESV313                  = T001_TABLE.RESV313,                 --カスタマイズ項目313
+                   RESV314                  = T001_TABLE.RESV314,                 --カスタマイズ項目314
+                   RESV315                  = T001_TABLE.RESV315,                 --カスタマイズ項目315
+                   RESV316                  = T001_TABLE.RESV316,                 --カスタマイズ項目316
+                   RESV317                  = T001_TABLE.RESV317,                 --カスタマイズ項目317
+                   RESV318                  = T001_TABLE.RESV318,                 --カスタマイズ項目318
+                   RESV319                  = T001_TABLE.RESV319,                 --カスタマイズ項目319
+                   RESV320                  = T001_TABLE.RESV320,                 --カスタマイズ項目320
+                   RESV321                  = T001_TABLE.RESV321,                 --カスタマイズ項目321
+                   RESV322                  = T001_TABLE.RESV322,                 --カスタマイズ項目322
+                   RESV323                  = T001_TABLE.RESV323,                 --カスタマイズ項目323
+                   RESV324                  = T001_TABLE.RESV324,                 --カスタマイズ項目324
+                   RESV325                  = T001_TABLE.RESV325,                 --カスタマイズ項目325
+                   RESV326                  = T001_TABLE.RESV326,                 --カスタマイズ項目326
+                   RESV327                  = T001_TABLE.RESV327,                 --カスタマイズ項目327
+                   RESV328                  = T001_TABLE.RESV328,                 --カスタマイズ項目328
+                   RESV329                  = T001_TABLE.RESV329,                 --カスタマイズ項目329
+                   RESV330                  = T001_TABLE.RESV330,                 --カスタマイズ項目330
+                   RESV331                  = T001_TABLE.RESV331,                 --カスタマイズ項目331
+                   RESV332                  = T001_TABLE.RESV332,                 --カスタマイズ項目332
+                   RESV333                  = T001_TABLE.RESV333,                 --カスタマイズ項目333
+                   RESV334                  = T001_TABLE.RESV334,                 --カスタマイズ項目334
+                   RESV335                  = T001_TABLE.RESV335,                 --カスタマイズ項目335
+                   RESV336                  = T001_TABLE.RESV336,                 --カスタマイズ項目336
+                   RESV337                  = T001_TABLE.RESV337,                 --カスタマイズ項目337
+                   RESV338                  = T001_TABLE.RESV338,                 --カスタマイズ項目338
+                   RESV339                  = T001_TABLE.RESV339,                 --カスタマイズ項目339
+                   RESV340                  = T001_TABLE.RESV340,                 --カスタマイズ項目340
+                   RESV341                  = T001_TABLE.RESV341,                 --カスタマイズ項目341
+                   RESV342                  = T001_TABLE.RESV342,                 --カスタマイズ項目342
+                   RESV343                  = T001_TABLE.RESV343,                 --カスタマイズ項目343
+                   RESV344                  = T001_TABLE.RESV344,                 --カスタマイズ項目344
+                   RESV345                  = T001_TABLE.RESV345,                 --カスタマイズ項目345
+                   RESV346                  = T001_TABLE.RESV346,                 --カスタマイズ項目346
+                   RESV347                  = T001_TABLE.RESV347,                 --カスタマイズ項目347
+                   RESV348                  = T001_TABLE.RESV348,                 --カスタマイズ項目348
+                   RESV349                  = T001_TABLE.RESV349,                 --カスタマイズ項目349
+                   RESV350                  = T001_TABLE.RESV350,                 --カスタマイズ項目350
+                   RESV351                  = T001_TABLE.RESV351,                 --カスタマイズ項目351
+                   RESV352                  = T001_TABLE.RESV352,                 --カスタマイズ項目352
+                   RESV353                  = T001_TABLE.RESV353,                 --カスタマイズ項目353
+                   RESV354                  = T001_TABLE.RESV354,                 --カスタマイズ項目354
+                   RESV355                  = T001_TABLE.RESV355,                 --カスタマイズ項目355
+                   RESV356                  = T001_TABLE.RESV356,                 --カスタマイズ項目356
+                   RESV357                  = T001_TABLE.RESV357,                 --カスタマイズ項目357
+                   RESV358                  = T001_TABLE.RESV358,                 --カスタマイズ項目358
+                   RESV359                  = T001_TABLE.RESV359,                 --カスタマイズ項目359
+                   RESV360                  = T001_TABLE.RESV360,                 --カスタマイズ項目360
+                   RESV361                  = T001_TABLE.RESV361,                 --カスタマイズ項目361
+                   RESV362                  = T001_TABLE.RESV362,                 --カスタマイズ項目362
+                   RESV363                  = T001_TABLE.RESV363,                 --カスタマイズ項目363
+                   RESV364                  = T001_TABLE.RESV364,                 --カスタマイズ項目364
+                   RESV365                  = T001_TABLE.RESV365,                 --カスタマイズ項目365
+                   RESV366                  = T001_TABLE.RESV366,                 --カスタマイズ項目366
+                   RESV367                  = T001_TABLE.RESV367,                 --カスタマイズ項目367
+                   RESV368                  = T001_TABLE.RESV368,                 --カスタマイズ項目368
+                   RESV369                  = T001_TABLE.RESV369,                 --カスタマイズ項目369
+                   RESV370                  = T001_TABLE.RESV370,                 --カスタマイズ項目370
+                   RESV371                  = T001_TABLE.RESV371,                 --カスタマイズ項目371
+                   RESV372                  = T001_TABLE.RESV372,                 --カスタマイズ項目372
+                   RESV373                  = T001_TABLE.RESV373,                 --カスタマイズ項目373
+                   RESV374                  = T001_TABLE.RESV374,                 --カスタマイズ項目374
+                   RESV375                  = T001_TABLE.RESV375,                 --カスタマイズ項目375
+                   RESV376                  = T001_TABLE.RESV376,                 --カスタマイズ項目376
+                   RESV377                  = T001_TABLE.RESV377,                 --カスタマイズ項目377
+                   RESV378                  = T001_TABLE.RESV378,                 --カスタマイズ項目378
+                   RESV379                  = T001_TABLE.RESV379,                 --カスタマイズ項目379
+                   RESV380                  = T001_TABLE.RESV380,                 --カスタマイズ項目380
+                   RESV381                  = T001_TABLE.RESV381,                 --カスタマイズ項目381
+                   RESV382                  = T001_TABLE.RESV382,                 --カスタマイズ項目382
+                   RESV383                  = T001_TABLE.RESV383,                 --カスタマイズ項目383
+                   RESV384                  = T001_TABLE.RESV384,                 --カスタマイズ項目384
+                   RESV385                  = T001_TABLE.RESV385,                 --カスタマイズ項目385
+                   RESV386                  = T001_TABLE.RESV386,                 --カスタマイズ項目386
+                   RESV387                  = T001_TABLE.RESV387,                 --カスタマイズ項目387
+                   RESV388                  = T001_TABLE.RESV388,                 --カスタマイズ項目388
+                   RESV389                  = T001_TABLE.RESV389,                 --カスタマイズ項目389
+                   RESV390                  = T001_TABLE.RESV390,                 --カスタマイズ項目390
+                   RESV391                  = T001_TABLE.RESV391,                 --カスタマイズ項目391
+                   RESV392                  = T001_TABLE.RESV392,                 --カスタマイズ項目392
+                   RESV393                  = T001_TABLE.RESV393,                 --カスタマイズ項目393
+                   RESV394                  = T001_TABLE.RESV394,                 --カスタマイズ項目394
+                   RESV395                  = T001_TABLE.RESV395,                 --カスタマイズ項目395
+                   RESV396                  = T001_TABLE.RESV396,                 --カスタマイズ項目396
+                   RESV397                  = T001_TABLE.RESV397,                 --カスタマイズ項目397
+                   RESV398                  = T001_TABLE.RESV398,                 --カスタマイズ項目398
+                   RESV399                  = T001_TABLE.RESV399,                 --カスタマイズ項目399
+                   RESV400                  = T001_TABLE.RESV400                  --カスタマイズ項目400
+                   
+             WHERE BIZ_CUST_ID = T001_TABLE.BIZ_CUST_ID               --業務別顧客ID
+               AND CUST_ID     = T001_TABLE.CUST_ID                   --顧客ID
+            ;
+        EXCEPTION
+            --# その他例外の処理
+            WHEN OTHERS THEN
+                N_RET := C_RET_NG;                --戻り値を異常終了に設定すること
+                --DBMS_OUTPUT.PUT_LINE(SQLCODE);    --メッセージコード出力
+                --DBMS_OUTPUT.PUT_LINE(SQLERRM);    --メッセージ出力
+                RAISE EX_UPDATE_T001_OHRS;
+        END;
+    --# 顧客情報の削除処理
+    WHEN C_TYT001_TABLE.DELETE THEN
+        BEGIN
+            DELETE
+              FROM T001_BIZ_CUST T001
+             WHERE T001.BIZ_CUST_ID = T001_TABLE.BIZ_CUST_ID          --業務別顧客ID
+               AND T001.CUST_ID     = T001_TABLE.CUST_ID              --顧客ID
+            ;
+        EXCEPTION
+            --# その他例外の処理
+            WHEN OTHERS THEN
+                N_RET := C_RET_NG;                --戻り値を異常終了に設定すること
+                --DBMS_OUTPUT.PUT_LINE(SQLCODE);    --メッセージコード出力
+                --DBMS_OUTPUT.PUT_LINE(SQLERRM);    --メッセージ出力
+                RAISE EX_DELETE_T001_OHRS;
+        END;
+    --# 顧客情報のその他処理
+    ELSE
+        NULL;
+    END CASE;
+    
+    --■戻り値設定
+    N_RET := C_RET_OK;
+    T001_TABLE.RET := N_RET;
+    
+EXCEPTION
+    --# 操作区分例外の処理
+    WHEN OTHERS THEN
+        T001_TABLE.RET := N_RET;                                         --戻り値設定
+        --DBMS_OUTPUT.PUT_LINE(SQLCODE);                          --メッセージコード出力
+        --DBMS_OUTPUT.PUT_LINE(SQLERRM);                          --メッセージ出力
+        RAISE;
+END;
+ 
+/
+

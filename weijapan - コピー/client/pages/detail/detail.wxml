@@ -1,0 +1,67 @@
+<scroll-view scroll-y="true" height="100%">
+  <!--loading......-->
+  <view wx:if="{{!detailinfo}}">
+    <view class="offline-notice">正在加载中，请稍等...</view>
+  </view>
+  <!--no data......-->
+  <view wx:elif="{{detailinfo.length === 0}}">
+    <view class="offline-notice">没有商品</view>
+  </view>
+  <!--display data......-->
+  <view wx:elif="{{detailinfo.length > 0}}">
+    <view class="item-container">
+      <view  class="flex-column">
+        <view class="flex-row " >
+          <view class="flex-cell-Image flex-row">
+            <image src="{{detailinfo[0].logo_src}}" mode="aspectFit"></image>
+          </view>
+          <view class="flex-row">
+            <view class="flex-column ">
+              <text style='padding-left:20rpx' >{{detailinfo[0].bland_nm}}</text>
+            </view>
+          </view>              
+
+        </view>
+        <view>
+          <text class='text'>{{detailinfo[0].introduction_word}}</text>
+        </view>
+        <view>
+          <swiper indicator-dots="true" autoplay="true" interval="5000" duration="1000">
+            <block wx:for="{{detailinfo[0].pic_list_url}}" wx:for-item="slide" wx:key="id">
+              <swiper-item>
+                <navigator >
+                  <image class="slide-img" src="{{slide}}" mode="aspectFit"/>
+                </navigator>
+              </swiper-item>
+            </block>
+          </swiper>
+        
+        </view>
+        <view>
+          <view>
+            <text>以下加盟商户一览</text>
+          </view>
+          <view>
+            <block wx:for="{{detailinfo[0].sort_v}}" wx:for-item="item" wx:key="id">
+              <view class="flex-row " >
+                <view class="flex-cell-Image1 flex-row">
+                  <image src="{{item.icon_src}}" mode="aspectFit"></image>
+                </view>
+                <view class="flex-row">
+                  <view class='flex-column flex-cell-Text1'>
+                    <text class='text-detail' >{{item.sales_nm}}</text>
+                    <text class='text-detail' >{{item.addr}}</text>
+                    <text class='text-detail' >电话号码：{{item.tel_no}}</text>
+                    <text class='text-detail' >营业时间：{{item.worktime}}</text>
+                  </view>
+                </view>              
+              </view>
+            </block>
+          </view>
+        
+        </view>
+      </view>
+    </view>
+  </view>
+
+</scroll-view>

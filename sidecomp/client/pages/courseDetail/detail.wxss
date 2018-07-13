@@ -1,0 +1,139 @@
+/* pages/courseDetail/detail.wxss */
+/* pages/courseCatalog/catalog.wxss */
+.flex-cell-Image-title{
+  width: 100%;
+  height: 300rpx;
+  color: #ffffff;
+  font-size: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+}
+.flex-cell-Text-ss{
+  font-size: 20rpx;   
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-left:5rpx;
+}
+.flex-cell-Image-s{
+  width: 80rpx;
+  height: 80rpx;
+  color: #ffffff;
+  font-size: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+
+}
+.flex-cell-Image-ss{
+  width: 40rpx;
+  height: 40rpx;
+  color: #ffffff;
+  font-size: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+}
+.flex-row{
+  display: flex;
+  flex-direction: row;
+
+}
+.flex-column{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: stretch;
+}
+.line{
+  width:95%;
+  height:4rpx;
+  background:#aaa;
+}
+.flex-cell-Text{
+  /* width: 60%;
+  height: 200rpx; */
+  /* color: #ffffff; */
+  font-size: 30rpx;   
+  display: flex;
+  /* justify-content: center;
+  align-items: center; */
+}
+
+.flex-cell-vadio{
+  width: 100%;
+  /* height: 300rpx;
+  color: #ffffff;
+  font-size: 10px; */
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+}
+.address-add {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  /* opacity: 0.6; */
+   background: #ffffff 
+}
+.address-list {
+  margin-bottom: 0rpx;
+}
+.button-Text{
+  width: 60%;
+  /* color: #ffffff; */
+  font-size: 30rpx;   
+  /* display: flex;
+  justify-content: center; */
+  align-items: center;
+}
+.button-hover {
+  background-color: red;
+}
+/** 添加自定义button点击态样式类**/
+.other-button-hover {
+  background-color: blue;
+}
+button {margin: 1rpx;}
+textarea {
+  width: 60%;
+  padding: 25rpx 0;
+}
+
+.textarea-wrp {
+  width: 80%;
+  padding: 0 25rpx;
+  background-color: #fff;
+}
+.flex-cell-Image-rl{
+  width: 100rpx;
+  height: 100rpx;
+  color: #ffffff;
+  font-size: 20rpx;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+}
+
+.flex-cell-cm-Text{
+  /* width: 60%; */
+  /* color: #ffffff; */
+  font-size: 20rpx;   
+  /* display: flex;
+  justify-content: center; */
+  align-items: center;
+}
+.shiting-text{
+  font-size: 25rpx;
+  border:3rpx solid;
+  border-color:green;
+  align-items: center;
+  color: green; 
+  justify-content: center;
+}

@@ -1,0 +1,21 @@
+SELECT m113.id, m113.bland_nm, m113.industry_nm, m113.bland_cd,m113.english_nm, m113.type_nm, m113.logo_src, m113.sort_v, m113.remark,concat(LEFT( m114.introduction_word, 50 ), (case WHEN LENGTH(m114.introduction_word) >50 THEN '..' ELSE '' END))  introduction_word
+,m114.pic_list_url
+FROM m113_brand_list m113,m114_bland_detail m114
+WHERE m113.id = m114.id
+
+create or REPLACE VIEW view_sales_list AS
+SELECT 
+(case when LENGTH(m116.icon_src)=0 THEN 'http://www.weijapan.cn/tpl/index/style/weijapan/img/no_images.png' ELSE m116.icon_src END) icon_src
+,m116.sales_nm,
+
+COALESCE(m116.addr1,m116.addr2) addr
+,m116.tel_no,m116.worktime,m116.googlemap,m115.id,REPLACE(trim(m115.bland_nm),'\r\n','') bland_nm FROM m116_sales_detail m116,m115_sales_list m115
+where m116.id = m115.id
+
+
+create or REPLACE view view_bland_list as 
+SELECT m113.id, m113.bland_nm, m113.industry_nm, m113.bland_cd,m113.english_nm, m113.type_nm, m113.logo_src, 
+m113.sort_v, m113.remark,concat(LEFT( m114.introduction_word, 50 ), (case WHEN LENGTH(m114.introduction_word) >50 THEN '..' ELSE '' END))  introduction_word
+,m114.pic_list_url,m114.introduction_word introduction_word_org
+FROM m113_bland_list m113,m114_bland_detail m114
+WHERE m113.id = m114.id
